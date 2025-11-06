@@ -75,7 +75,7 @@ export default function WelcomeMessage() {
                 key={example}
                 className="text-xs bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full"
               >
-                "{example}"
+                &quot;{example}&quot;
               </span>
             ))}
           </div>

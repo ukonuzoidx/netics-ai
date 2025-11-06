@@ -6,9 +6,9 @@ import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 
 interface ChatPageProps {
-  params: {
+  params: Promise<{
     chatId: Id<"chats">;
-  };
+  }>;
 }
 
 export default async function ChatPage({ params }: ChatPageProps) {

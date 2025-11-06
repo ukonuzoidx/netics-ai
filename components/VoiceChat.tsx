@@ -307,7 +307,7 @@ export default function VoiceChat() {
               if (data.type === 'token' && data.token) {
                 aiResponse += data.token;
               }
-            } catch (e) {
+            } catch {
               // Skip invalid JSON
             }
           }
@@ -482,7 +482,7 @@ export default function VoiceChat() {
             </p>
             {currentTranscript && !isAiSpeaking && (
               <p className="text-sm text-gray-500 italic">
-                Last: "{currentTranscript}"
+                Last: &quot;{currentTranscript}&quot;
               </p>
             )}
           </div>
@@ -558,7 +558,7 @@ export default function VoiceChat() {
             <ul className="space-y-2 text-sm text-gray-600">
               <li className="flex items-start gap-2">
                 <span className="text-green-500 mt-0.5">●</span>
-                Click "Start Voice Chat" to begin
+                Click &quot;Start Voice Chat&quot; to begin
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-0.5">●</span>
@@ -566,11 +566,11 @@ export default function VoiceChat() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-purple-500 mt-0.5">●</span>
-                Pause for 2 seconds when you're done speaking
+                Pause for 2 seconds when you&apos;re done speaking
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-yellow-500 mt-0.5">●</span>
-                Click "Pause Mic" when typing or not speaking to avoid false triggers
+                Click &quot;Pause Mic&quot; when typing or not speaking to avoid false triggers
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-orange-500 mt-0.5">●</span>
@@ -578,7 +578,7 @@ export default function VoiceChat() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-red-500 mt-0.5">●</span>
-                Click "End Call" when you're done
+                Click &quot;End Call&quot; when you&apos;re done
               </li>
             </ul>
           </div>

@@ -69,6 +69,8 @@ export default function ChatInterface({
     return JSON.stringify(output, null, 2);
   };
 
+  // Commented out - not currently used in production
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const formatTerminalOutput = (
     tool: string,
     input: unknown,

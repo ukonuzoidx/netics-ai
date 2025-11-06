@@ -141,6 +141,7 @@ export function MessageBubble({ content, isUser }: MessageBubbleProps) {
                   <p className="text-gray-900 my-2">{children}</p>
                 ),
                 // Style code blocks
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 code: ({ inline, children, ...props }: any) =>
                   inline ? (
                     <code className="bg-gray-100 text-red-600 px-1 py-0.5 rounded text-sm font-mono" {...props}>
