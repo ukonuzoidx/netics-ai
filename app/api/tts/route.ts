@@ -13,10 +13,7 @@ export async function POST(request: NextRequest) {
 
     if (!text) {
       console.error("❌ No text provided");
-      return NextResponse.json(
-        { error: "Text is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Text is required" }, { status: 400 });
     }
 
     if (!process.env.ELEVENLABS_API_KEY) {
@@ -45,13 +42,13 @@ export async function POST(request: NextRequest) {
     // Convert the ReadableStream to a buffer
     const reader = audioStream.getReader();
     const chunks: Uint8Array[] = [];
-    
+
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
       chunks.push(value);
     }
-    
+
     const audioBuffer = Buffer.concat(chunks);
 
     console.log("✅ Audio generated, size:", audioBuffer.length, "bytes");
@@ -67,7 +64,10 @@ export async function POST(request: NextRequest) {
     console.error("❌ Text-to-speech error:", error);
     console.error("Error details:", JSON.stringify(error, null, 2));
     return NextResponse.json(
-      { error: "Failed to generate speech", details: error instanceof Error ? error.message : String(error) },
+      {
+        error: "Failed to generate speech",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }

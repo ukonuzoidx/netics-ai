@@ -9,14 +9,18 @@ export default function VoiceChat() {
   const [isRecording, setIsRecording] = useState(false);
   const [isMicPaused, setIsMicPaused] = useState(false);
   const [isAiSpeaking, setIsAiSpeaking] = useState(false);
-  const [conversation, setConversation] = useState<Array<{ role: 'user' | 'assistant', text: string }>>([]);
+  const [conversation, setConversation] = useState<
+    Array<{ role: "user" | "assistant"; text: string }>
+  >([]);
   const [currentTranscript, setCurrentTranscript] = useState("");
-  
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const conversationRef = useRef<Array<{ role: 'user' | 'assistant', content: string }>>([]);
+  const conversationRef = useRef<
+    Array<{ role: "user" | "assistant"; content: string }>
+  >([]);
   const isCallActiveRef = useRef<boolean>(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -38,7 +42,9 @@ export default function VoiceChat() {
       await startRecordingProcess();
     } catch (error) {
       console.error("Failed to start call:", error);
-      alert("Could not access microphone. Please allow microphone permissions.");
+      alert(
+        "Could not access microphone. Please allow microphone permissions."
+      );
     }
   };
 
@@ -74,11 +80,11 @@ export default function VoiceChat() {
 
   const startRecordingProcess = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
+      const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           channelCount: 1,
           sampleRate: 16000,
-        } 
+        },
       });
 
       streamRef.current = stream;
@@ -123,12 +129,12 @@ export default function VoiceChat() {
 
     const bufferLength = analyserRef.current.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
-    
+
     const checkAudio = () => {
       if (!analyserRef.current || !isCallActiveRef.current) return;
 
       analyserRef.current.getByteTimeDomainData(dataArray);
-      
+
       // Calculate volume level
       let sum = 0;
       for (let i = 0; i < bufferLength; i++) {
@@ -136,7 +142,7 @@ export default function VoiceChat() {
         sum += value * value;
       }
       const volume = Math.sqrt(sum / bufferLength);
-      
+
       // Threshold for detecting speech (adjust if needed)
       const isSpeaking = volume > 0.01;
 
@@ -151,14 +157,19 @@ export default function VoiceChat() {
         if (silenceTimerRef.current) {
           clearTimeout(silenceTimerRef.current);
         }
-        
+
         silenceTimerRef.current = setTimeout(() => {
-          if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
-            console.log("⏱️ Silence detected after speaking, stopping recording...");
+          if (
+            mediaRecorderRef.current &&
+            mediaRecorderRef.current.state === "recording"
+          ) {
+            console.log(
+              "⏱️ Silence detected after speaking, stopping recording..."
+            );
             mediaRecorderRef.current.stop();
           }
         }, 2000); // 2 seconds of silence after speaking
-        
+
         isSpeakingRef.current = false;
       }
 
@@ -170,13 +181,16 @@ export default function VoiceChat() {
   };
 
   const handleSilence = async () => {
-    console.log("🔍 handleSilence called, audioChunks length:", audioChunksRef.current.length);
-    
+    console.log(
+      "🔍 handleSilence called, audioChunks length:",
+      audioChunksRef.current.length
+    );
+
     if (!isCallActiveRef.current) {
       console.log("⚠️ Call ended, skipping processing");
       return;
     }
-    
+
     if (audioChunksRef.current.length === 0) {
       console.log("⚠️ No audio chunks recorded, restarting...");
       if (isCallActiveRef.current) {
@@ -186,28 +200,33 @@ export default function VoiceChat() {
     }
 
     try {
-      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+      const audioBlob = new Blob(audioChunksRef.current, {
+        type: "audio/webm",
+      });
       console.log("🎵 Audio blob created, size:", audioBlob.size, "bytes");
-      
+
       const message = await transcribeAudio(audioBlob);
       console.log("📝 Transcription:", message);
-      
+
       if (message && message.trim()) {
         setCurrentTranscript(message);
-        
+
         // No keyword check - always respond to any speech
         console.log("🎯 Processing user message...");
-        
-        const userMessage = { role: 'user' as const, text: message };
-        setConversation(prev => [...prev, userMessage]);
-        conversationRef.current.push({ role: 'user', content: message });
+
+        const userMessage = { role: "user" as const, text: message };
+        setConversation((prev) => [...prev, userMessage]);
+        conversationRef.current.push({ role: "user", content: message });
 
         console.log("🤖 Getting AI response...");
         const responseText = await getAIResponse(message);
-        
-        const aiMessage = { role: 'assistant' as const, text: responseText };
-        setConversation(prev => [...prev, aiMessage]);
-        conversationRef.current.push({ role: 'assistant', content: responseText });
+
+        const aiMessage = { role: "assistant" as const, text: responseText };
+        setConversation((prev) => [...prev, aiMessage]);
+        conversationRef.current.push({
+          role: "assistant",
+          content: responseText,
+        });
 
         await convertResponseToAudio(responseText);
         console.log("🎵 Audio playback completed");
@@ -232,12 +251,17 @@ export default function VoiceChat() {
       cancelAnimationFrame(animationFrameRef.current);
       animationFrameRef.current = null;
     }
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+    if (
+      mediaRecorderRef.current &&
+      mediaRecorderRef.current.state === "recording"
+    ) {
       mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+      mediaRecorderRef.current.stream
+        .getTracks()
+        .forEach((track) => track.stop());
     }
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
     if (silenceTimerRef.current) {
@@ -248,13 +272,13 @@ export default function VoiceChat() {
 
   const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
     console.log("📝 Transcribing audio... blob size:", audioBlob.size);
-    
+
     try {
       const formData = new FormData();
-      formData.append('audio', audioBlob, 'audio.webm');
+      formData.append("audio", audioBlob, "audio.webm");
 
-      const response = await fetch('/api/transcribe', {
-        method: 'POST',
+      const response = await fetch("/api/transcribe", {
+        method: "POST",
         body: formData,
       });
 
@@ -263,7 +287,7 @@ export default function VoiceChat() {
       if (!response.ok) {
         const errorText = await response.text();
         console.error("❌ Transcription failed:", errorText);
-        throw new Error('Transcription failed: ' + errorText);
+        throw new Error("Transcription failed: " + errorText);
       }
 
       const data = await response.json();
@@ -276,9 +300,9 @@ export default function VoiceChat() {
   };
 
   const getAIResponse = async (message: string): Promise<string> => {
-    const response = await fetch('/api/chat/stream', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await fetch("/api/chat/stream", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         messages: conversationRef.current.slice(0, -1),
         newMessage: message,
@@ -286,11 +310,11 @@ export default function VoiceChat() {
     });
 
     if (!response.ok) {
-      throw new Error('AI response failed');
+      throw new Error("AI response failed");
     }
 
     const reader = response.body?.getReader();
-    let aiResponse = '';
+    let aiResponse = "";
 
     if (reader) {
       while (true) {
@@ -298,13 +322,13 @@ export default function VoiceChat() {
         if (done) break;
 
         const chunk = new TextDecoder().decode(value);
-        const lines = chunk.split('\n');
-        
+        const lines = chunk.split("\n");
+
         for (const line of lines) {
-          if (line.startsWith('data: ')) {
+          if (line.startsWith("data: ")) {
             try {
               const data = JSON.parse(line.slice(6));
-              if (data.type === 'token' && data.token) {
+              if (data.type === "token" && data.token) {
                 aiResponse += data.token;
               }
             } catch {
@@ -316,12 +340,12 @@ export default function VoiceChat() {
     }
 
     console.log("✅ AI Response:", aiResponse);
-    
+
     if (!aiResponse.trim()) {
       console.warn("⚠️ Empty AI response, using fallback");
       return "I'm sorry, I didn't get a response. Please try again.";
     }
-    
+
     return aiResponse;
   };
 
@@ -329,8 +353,7 @@ export default function VoiceChat() {
     console.log("🔊 Converting response to audio...");
     setIsAiSpeaking(true);
 
-    
-        try {
+    try {
       // Clean markdown formatting for natural speech
       const cleanText = text
         // Remove code blocks
@@ -362,9 +385,12 @@ export default function VoiceChat() {
         .replace(/\s+/g, " ")
         .trim();
 
-      console.log("🧹 Cleaned text for TTS:", cleanText.substring(0, 100) + "...");
+      console.log(
+        "🧹 Cleaned text for TTS:",
+        cleanText.substring(0, 100) + "..."
+      );
 
-     if (!cleanText) {
+      if (!cleanText) {
         setIsAiSpeaking(false);
         return;
       }
@@ -409,10 +435,9 @@ export default function VoiceChat() {
         console.log("🔊 Playing audio...");
         audio.play().catch(reject);
       });
-      
+
       console.log("🎵 Audio playback complete");
-    } 
-    catch (error) {
+    } catch (error) {
       console.error("❌ TTS error:", error);
       setIsAiSpeaking(false);
       throw error;
@@ -435,53 +460,54 @@ export default function VoiceChat() {
   }, []);
 
   return (
-    <div className="flex flex-col h-full items-center justify-center p-8">
+    <div className="flex flex-col h-full items-center justify-center p-8 bg-neutral-950">
       <div className="max-w-2xl w-full space-y-8">
         <div className="text-center space-y-4">
-          <div className={`inline-flex items-center justify-center w-32 h-32 rounded-full transition-all duration-300 ${
-            isCallActive 
-              ? isAiSpeaking 
-                ? 'bg-blue-100 ring-8 ring-blue-500/20 animate-pulse' 
-                : isMicPaused
-                ? 'bg-yellow-100 ring-8 ring-yellow-500/20'
-                : isRecording
-                ? 'bg-red-100 ring-8 ring-red-500/20 animate-pulse'
-                : 'bg-green-100 ring-8 ring-green-500/20'
-              : 'bg-gray-100'
-          }`}>
+          <div
+            className={`inline-flex items-center justify-center w-32 h-32 rounded-full transition-all duration-300 ${
+              isCallActive
+                ? isAiSpeaking
+                  ? "bg-blue-950 ring-8 ring-blue-500/20 animate-pulse"
+                  : isMicPaused
+                  ? "bg-yellow-950 ring-8 ring-yellow-500/20"
+                  : isRecording
+                  ? "bg-red-950 ring-8 ring-red-500/20 animate-pulse"
+                  : "bg-green-950 ring-8 ring-green-500/20"
+                : "bg-neutral-900"
+            }`}
+          >
             {isCallActive ? (
               isAiSpeaking ? (
-                <Volume2 className="w-16 h-16 text-blue-600" />
+                <Volume2 className="w-16 h-16 text-blue-400" />
               ) : isMicPaused ? (
-                <MicOff className="w-16 h-16 text-yellow-600" />
+                <MicOff className="w-16 h-16 text-yellow-400" />
               ) : isRecording ? (
-                <Mic className="w-16 h-16 text-red-600" />
+                <Mic className="w-16 h-16 text-red-400" />
               ) : (
-                <MicOff className="w-16 h-16 text-gray-400" />
+                <MicOff className="w-16 h-16 text-neutral-500" />
               )
             ) : (
-              <Phone className="w-16 h-16 text-gray-400" />
+              <Phone className="w-16 h-16 text-neutral-500" />
             )}
           </div>
 
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold bg-gradient-to-br from-gray-900 to-gray-600 bg-clip-text text-transparent">
-              {isCallActive ? 'Voice Chat Active' : 'Voice Chat'}
+            <h1 className="text-3xl font-bold bg-gradient-to-br from-neutral-100 to-neutral-400 bg-clip-text text-transparent">
+              {isCallActive ? "Voice Chat Active" : "Voice Chat"}
             </h1>
-            <p className="text-gray-600">
-              {isCallActive 
-                ? isAiSpeaking 
-                  ? 'AI is speaking...' 
+            <p className="text-neutral-400">
+              {isCallActive
+                ? isAiSpeaking
+                  ? "AI is speaking..."
                   : isMicPaused
-                  ? 'Microphone paused - click to resume'
-                  : isRecording 
-                  ? 'Listening to you...' 
-                  : 'Processing...'
-                : 'Start a voice conversation with AI'
-              }
+                  ? "Microphone paused - click to resume"
+                  : isRecording
+                  ? "Listening to you..."
+                  : "Processing..."
+                : "Start a voice conversation with AI"}
             </p>
             {currentTranscript && !isAiSpeaking && (
-              <p className="text-sm text-gray-500 italic">
+              <p className="text-sm text-neutral-500 italic">
                 Last: &quot;{currentTranscript}&quot;
               </p>
             )}
@@ -502,9 +528,9 @@ export default function VoiceChat() {
               <Button
                 onClick={toggleMic}
                 className={`${
-                  isMicPaused 
-                    ? 'bg-yellow-500 hover:bg-yellow-600' 
-                    : 'bg-blue-500 hover:bg-blue-600'
+                  isMicPaused
+                    ? "bg-yellow-500 hover:bg-yellow-600"
+                    : "bg-blue-500 hover:bg-blue-600"
                 } text-white px-8 py-6 text-lg rounded-full shadow-lg`}
               >
                 {isMicPaused ? (
@@ -531,18 +557,22 @@ export default function VoiceChat() {
         </div>
 
         {isCallActive && conversation.length > 0 && (
-          <div className="bg-white rounded-2xl border border-gray-200 p-6 max-h-96 overflow-y-auto space-y-4">
-            <h3 className="text-sm font-medium text-gray-500 mb-4">Conversation</h3>
+          <div className="bg-neutral-900 rounded-2xl border border-neutral-800 p-6 max-h-96 overflow-y-auto space-y-4">
+            <h3 className="text-sm font-medium text-neutral-400 mb-4">
+              Conversation
+            </h3>
             {conversation.map((msg, idx) => (
               <div
                 key={idx}
-                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex ${
+                  msg.role === "user" ? "justify-end" : "justify-start"
+                }`}
               >
                 <div
                   className={`px-4 py-2 rounded-2xl max-w-[80%] ${
-                    msg.role === 'user'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 text-gray-900'
+                    msg.role === "user"
+                      ? "bg-blue-500 text-white"
+                      : "bg-neutral-800 text-neutral-100"
                   }`}
                 >
                   <p className="text-sm">{msg.text}</p>
@@ -553,9 +583,9 @@ export default function VoiceChat() {
         )}
 
         {!isCallActive && (
-          <div className="bg-gray-50 rounded-2xl border border-gray-200 p-6 space-y-3">
-            <h3 className="font-medium text-gray-900">How it works:</h3>
-            <ul className="space-y-2 text-sm text-gray-600">
+          <div className="bg-neutral-900 rounded-2xl border border-neutral-800 p-6 space-y-3">
+            <h3 className="font-medium text-neutral-100">How it works:</h3>
+            <ul className="space-y-2 text-sm text-neutral-400">
               <li className="flex items-start gap-2">
                 <span className="text-green-500 mt-0.5">●</span>
                 Click &quot;Start Voice Chat&quot; to begin
@@ -570,7 +600,8 @@ export default function VoiceChat() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-yellow-500 mt-0.5">●</span>
-                Click &quot;Pause Mic&quot; when typing or not speaking to avoid false triggers
+                Click &quot;Pause Mic&quot; when typing or not speaking to avoid
+                false triggers
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-orange-500 mt-0.5">●</span>

@@ -1,6 +1,6 @@
 "use client";
 
-import Sidebar from "@/components/Sidebar";
+import DashboardSidebar from "@/components/DashboardSidebar";
 import Header from "@/components/Header";
 import { NavigationProvider } from "@/lib/context/navigation";
 import { Authenticated } from "convex/react";
@@ -12,14 +12,16 @@ export default function DashboardLayout({
 }) {
   return (
     <NavigationProvider>
-      <div className="flex h-screen">
+      <div className="flex h-screen overflow-hidden bg-neutral-950">
         <Authenticated>
-          <Sidebar />
+          <DashboardSidebar />
         </Authenticated>
 
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           <Header />
-          <main className="flex-1 overflow-y-auto">{children}</main>
+          <main className="flex-1 overflow-y-auto bg-neutral-950">
+            {children}
+          </main>
         </div>
       </div>
     </NavigationProvider>

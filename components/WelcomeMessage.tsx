@@ -1,18 +1,21 @@
 export default function WelcomeMessage() {
   return (
     <div className="flex flex-col items-center justify-center h-full mt-10">
-      <div className="bg-white rounded-2xl shadow-sm ring-1 ring-inset ring-gray-200 px-6 py-5 max-w-2xl w-full">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <div className="bg-neutral-900 rounded-2xl shadow-sm ring-1 ring-inset ring-neutral-800 px-6 py-5 max-w-2xl w-full">
+        <h2 className="text-2xl font-bold text-neutral-100 mb-2">
           👋 Welcome to Netics AI
         </h2>
-        <p className="text-gray-600 mb-4 leading-relaxed">
-          Your all-in-one AI assistant that eliminates app-switching. I can help you with:
+        <p className="text-neutral-400 mb-4 leading-relaxed">
+          Your all-in-one AI assistant that eliminates app-switching. I can help
+          you with:
         </p>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <h3 className="font-semibold text-gray-800 mb-2">🔍 Research & Learning</h3>
-            <ul className="space-y-1.5 text-sm text-gray-600">
+            <h3 className="font-semibold text-neutral-200 mb-2">
+              🔍 Research & Learning
+            </h3>
+            <ul className="space-y-1.5 text-sm text-neutral-400">
               <li className="flex items-start gap-2">
                 <span className="text-blue-500">•</span>
                 <span>Search Wikipedia articles</span>
@@ -31,10 +34,12 @@ export default function WelcomeMessage() {
               </li>
             </ul>
           </div>
-          
+
           <div>
-            <h3 className="font-semibold text-gray-800 mb-2">🛠️ Utilities & Tools</h3>
-            <ul className="space-y-1.5 text-sm text-gray-600">
+            <h3 className="font-semibold text-neutral-200 mb-2">
+              🛠️ Utilities & Tools
+            </h3>
+            <ul className="space-y-1.5 text-sm text-neutral-400">
               <li className="flex items-start gap-2">
                 <span className="text-blue-500">•</span>
                 <span>Check weather anywhere</span>
@@ -55,15 +60,18 @@ export default function WelcomeMessage() {
           </div>
         </div>
 
-        <div className="bg-blue-50 rounded-lg p-3 mb-4">
-          <p className="text-sm text-blue-900 font-medium mb-1">🚀 Coming Soon:</p>
-          <p className="text-xs text-blue-700">
-            Calendar scheduling • Expense tracking • Smart home control • Travel booking • Voice commands • And more!
+        <div className="bg-blue-950 rounded-lg p-3 mb-4 border border-blue-900">
+          <p className="text-sm text-blue-400 font-medium mb-1">
+            🚀 Coming Soon:
+          </p>
+          <p className="text-xs text-blue-300">
+            Calendar scheduling • Expense tracking • Smart home control • Travel
+            booking • Voice commands • And more!
           </p>
         </div>
-        
-        <div className="border-t pt-3">
-          <p className="text-sm text-gray-500 mb-2">Try asking me:</p>
+
+        <div className="border-t border-neutral-800 pt-3">
+          <p className="text-sm text-neutral-500 mb-2">Try asking me:</p>
           <div className="flex flex-wrap gap-2">
             {[
               "What's the weather in Tokyo?",
@@ -73,7 +81,7 @@ export default function WelcomeMessage() {
             ].map((example) => (
               <span
                 key={example}
-                className="text-xs bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full"
+                className="text-xs bg-neutral-800 text-neutral-300 px-2.5 py-1 rounded-full border border-neutral-700"
               >
                 &quot;{example}&quot;
               </span>

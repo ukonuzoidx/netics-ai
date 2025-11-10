@@ -57,6 +57,17 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      animation: {
+        "cell-ripple":
+          "cell-ripple var(--duration, 200ms) ease-out var(--delay, 0ms)",
+      },
+      keyframes: {
+        "cell-ripple": {
+          "0%": { opacity: "0.4" },
+          "50%": { opacity: "0.8" },
+          "100%": { opacity: "0.4" },
+        },
+      },
     },
   },
   plugins: [tailwindcssAnimate, tailwindcssTypography],

@@ -43,6 +43,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
 
     return (
       <div className="flex-1 overflow-hidden">
+        {/* <ChatInterfaceV2 chatId={chatId} initialMessages={initialMessages} /> */}
         <ChatInterface chatId={chatId} initialMessages={initialMessages} />
       </div>
     );

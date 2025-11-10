@@ -10,7 +10,9 @@ import { MessageBubble } from "@/components/MessageBubble";
 import { ArrowRight, Volume2, VolumeX, Mic, MicOff } from "lucide-react";
 import { getConvexClient } from "@/lib/convex";
 import { api } from "@/convex/_generated/api";
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
 
 interface ChatInterfaceProps {
   chatId: Id<"chats">;
@@ -40,7 +42,7 @@ export default function ChatInterface({
     transcript,
     listening,
     resetTranscript,
-    browserSupportsSpeechRecognition
+    browserSupportsSpeechRecognition,
   } = useSpeechRecognition();
 
   // Update input with transcript
@@ -84,9 +86,13 @@ export default function ChatInterface({
         <span class="text-gray-400 ml-1 text-sm">~/Searching </span>
       </div>
       <div class="text-gray-400 mt-1">$ Input</div>
-      <pre class="text-yellow-400 mt-0.5 whitespace-pre-wrap overflow-x-auto">${formatToolOutput(input)}</pre>
+      <pre class="text-yellow-400 mt-0.5 whitespace-pre-wrap overflow-x-auto">${formatToolOutput(
+        input
+      )}</pre>
       <div class="text-gray-400 mt-2">$ Output</div>
-      <pre class="text-green-400 mt-0.5 whitespace-pre-wrap overflow-x-auto">${formatToolOutput(output)}</pre>
+      <pre class="text-green-400 mt-0.5 whitespace-pre-wrap overflow-x-auto">${formatToolOutput(
+        output
+      )}</pre>
     </div>`;
 
     return `---START---\n${terminalHtml}\n---END---`;
@@ -309,12 +315,12 @@ export default function ChatInterface({
               setMessages((prev) => [...prev, assistantMessage]);
               setStreamedResponse("");
               setIsToolExecuting(false);
-              
+
               // Auto-speak the response if enabled
               if (autoSpeak && fullResponse) {
                 await speakText(fullResponse);
               }
-              
+
               return;
           }
         }
@@ -340,7 +346,7 @@ export default function ChatInterface({
   return (
     <main className="flex flex-col h-[calc(100vh-theme(spacing.14))]">
       {/* Messages container */}
-      <section className="flex-1 overflow-y-auto bg-gray-50 p-2 md:p-0">
+      <section className="flex-1 overflow-y-auto bg-neutral-950 p-2 md:p-0">
         <div className="max-w-4xl mx-auto p-4 space-y-3">
           {messages?.length === 0 && <WelcomeMessage />}
 
@@ -357,7 +363,7 @@ export default function ChatInterface({
           {/* Tool execution indicator */}
           {isToolExecuting && (
             <div className="flex justify-start animate-in fade-in-0">
-              <div className="rounded-2xl px-4 py-3 bg-white text-gray-900 rounded-bl-none shadow-sm ring-1 ring-inset ring-gray-200">
+              <div className="rounded-2xl px-4 py-3 bg-neutral-800 text-neutral-100 rounded-bl-none shadow-sm ring-1 ring-inset ring-neutral-700">
                 <div className="flex items-center gap-2">
                   <div className="flex gap-1.5">
                     {[0.3, 0.15, 0].map((delay, i) => (
@@ -368,8 +374,10 @@ export default function ChatInterface({
                       />
                     ))}
                   </div>
-                  <span className="text-sm text-gray-600">
-                    {currentTool?.name ? `Using ${currentTool.name}...` : "Processing..."}
+                  <span className="text-sm text-neutral-300">
+                    {currentTool?.name
+                      ? `Using ${currentTool.name}...`
+                      : "Processing..."}
                   </span>
                 </div>
               </div>
@@ -379,12 +387,12 @@ export default function ChatInterface({
           {/* Loading indicator */}
           {isLoading && !streamedResponse && !isToolExecuting && (
             <div className="flex justify-start animate-in fade-in-0">
-              <div className="rounded-2xl px-4 py-3 bg-white text-gray-900 rounded-bl-none shadow-sm ring-1 ring-inset ring-gray-200">
+              <div className="rounded-2xl px-4 py-3 bg-neutral-800 text-neutral-100 rounded-bl-none shadow-sm ring-1 ring-inset ring-neutral-700">
                 <div className="flex items-center gap-1.5">
                   {[0.3, 0.15, 0].map((delay, i) => (
                     <div
                       key={i}
-                      className="h-1.5 w-1.5 rounded-full bg-gray-400 animate-bounce"
+                      className="h-1.5 w-1.5 rounded-full bg-neutral-400 animate-bounce"
                       style={{ animationDelay: `-${delay}s` }}
                     />
                   ))}
@@ -397,8 +405,15 @@ export default function ChatInterface({
       </section>
 
       {/* Input form */}
-      <footer className="border-t bg-white p-4">
-        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto relative">
+      <footer className="border-t border-neutral-800 bg-neutral-900 p-4 relative overflow-hidden">
+        {/* Animated gradient blob when AI is speaking */}
+        {isSpeaking && (
+          <div className="absolute -top-32 left-0 right-0 h-64 pointer-events-none">
+            <div className="absolute inset-0 ai-speaking-gradient opacity-40 blur-3xl"></div>
+          </div>
+        )}
+        
+        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto relative z-10">
           {/* Voice controls */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -409,30 +424,30 @@ export default function ChatInterface({
                 onClick={() => setAutoSpeak(!autoSpeak)}
                 className={`text-xs ${
                   autoSpeak
-                    ? "bg-blue-50 text-blue-600 border-blue-200"
-                    : "text-gray-600"
+                    ? "bg-blue-950 text-blue-400 border-blue-800"
+                    : "text-neutral-400 border-neutral-700"
                 }`}
               >
                 <Volume2 className="w-3.5 h-3.5 mr-1.5" />
                 Auto-speak {autoSpeak ? "ON" : "OFF"}
               </Button>
-              
+
               {isSpeaking && (
                 <Button
                   type="button"
                   size="sm"
                   variant="outline"
                   onClick={stopSpeaking}
-                  className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 animate-pulse"
+                  className="text-xs text-red-400 hover:text-red-300 hover:bg-red-950 border-red-800 animate-pulse"
                 >
                   <VolumeX className="w-3.5 h-3.5 mr-1.5" />
                   Stop Speaking
                 </Button>
               )}
             </div>
-            
+
             {isSpeaking && (
-              <div className="flex items-center gap-1.5 text-xs text-blue-600">
+              <div className="flex items-center gap-1.5 text-xs text-blue-400">
                 <div className="flex gap-0.5">
                   {[0, 0.1, 0.2].map((delay, i) => (
                     <div
@@ -447,7 +462,7 @@ export default function ChatInterface({
             )}
 
             {listening && (
-              <div className="flex items-center gap-1.5 text-xs text-red-600">
+              <div className="flex items-center gap-1.5 text-xs text-red-400">
                 <div className="flex gap-0.5">
                   {[0, 0.1, 0.2].map((delay, i) => (
                     <div
@@ -472,7 +487,7 @@ export default function ChatInterface({
                 className={`rounded-xl h-11 w-11 p-0 flex items-center justify-center transition-all ${
                   listening
                     ? "bg-red-500 hover:bg-red-600 text-white animate-pulse"
-                    : "bg-gray-100 hover:bg-gray-200 text-gray-600"
+                    : "bg-neutral-800 hover:bg-neutral-700 text-neutral-400"
                 }`}
                 title={listening ? "Stop listening" : "Start voice input"}
               >
@@ -483,16 +498,16 @@ export default function ChatInterface({
                 )}
               </Button>
             )}
-            
+
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={listening ? "Listening..." : "Message AI Agent..."}
-              className={`flex-1 py-3 px-4 rounded-2xl border focus:outline-none focus:ring-2 focus:border-transparent pr-12 placeholder:text-gray-500 ${
+              className={`flex-1 py-3 px-4 rounded-2xl border focus:outline-none focus:ring-2 focus:border-transparent pr-12 placeholder:text-neutral-500 ${
                 listening
-                  ? "border-red-300 focus:ring-red-500 bg-red-50/50 animate-pulse"
-                  : "border-gray-200 focus:ring-blue-500 bg-gray-50"
+                  ? "border-red-700 focus:ring-red-500 bg-red-950/50 animate-pulse text-neutral-100"
+                  : "border-neutral-700 focus:ring-blue-500 bg-neutral-800 text-neutral-100"
               }`}
               disabled={isLoading}
             />
@@ -502,13 +517,14 @@ export default function ChatInterface({
               className={`absolute right-1.5 rounded-xl h-9 w-9 p-0 flex items-center justify-center transition-all ${
                 input.trim()
                   ? "bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
-                  : "bg-gray-100 text-gray-400"
+                  : "bg-neutral-800 text-neutral-500"
               }`}
             >
               <ArrowRight />
             </Button>
           </div>
         </form>
+    
       </footer>
     </main>
   );

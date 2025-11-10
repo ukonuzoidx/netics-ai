@@ -1,81 +1,229 @@
+"use client";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Mic, Plus } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
+import mainFrameSvg from "../public/gradient/main-frame-1.svg";
+import neticsAIIm from "../public/netics_ai.png";
+import neticsAIM from "../public/netics_ai_main_logo.png";
+import groupTaskSvg from "../public/group_task.svg";
+import rightYellow from "../public/gradient/right-yellow.svg";
+import centerPurple from "../public/gradient/center-purple.svg";
+import rightRed from "../public/gradient/right-red.svg";
+import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
+import { TextHoverEffect } from "@/components/ui/text-hover-effect";
+import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
+import {
+  Navbar,
+  NavBody,
+  NavItems,
+  MobileNav,
+  NavbarButton,
+  MobileNavHeader,
+  MobileNavToggle,
+  MobileNavMenu,
+} from "@/components/ui/resizable-navbar";
+import { useState } from "react";
+import { TextGradientEffect } from "@/components/ui/text-gradient-effect";
 
 export default function LandingPage() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const navItems = [
+    { name: "Chat", link: "#chat" },
+    { name: "Features", link: "#features" },
+    { name: "About", link: "#about" },
+  ];
+
   return (
-    <main className="min-h-screen bg-gradient-to-b from-white to-gray-50/50 flex items-center justify-center">
-      {/* Background pattern */}
-      <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#e5e5e5_1px,transparent_1px),linear-gradient(to_bottom,#e5e5e5_1px,transparent_1px)] bg-[size:6rem_4rem]" />
+    <main className="w-full min-h-screen relative overflow-hidden">
+      {/* Gradient Background - Layer 2 (middle) */}
+      <div className="text-gray-800">
+        <BackgroundRippleEffect rows={10} cols={20} cellSize={280} />
+      </div>
 
-      <section className="w-full px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8 flex flex-col items-center space-y-10 text-center">
-        {/* Hero content */}
-        <header className="space-y-6">
-          <h1 className="text-5xl font-bold tracking-tight sm:text-7xl bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
-            Netics AI
-          </h1>
-          <p className="max-w-[700px] text-lg text-gray-600 md:text-xl/relaxed xl:text-2xl/relaxed">
-            Your revolutionary all-in-one AI assistant that eliminates app-switching forever.
-            <br />
-            <span className="text-base font-medium text-gray-800 mt-2 block">
-              Schedule meetings, track expenses, control smart homes, book transport, and more—all with simple commands.
-            </span>
-            <br />
-            <span className="text-gray-400 text-sm">
-              Powered by Claude AI & LangChain • Evolving into your physical humanoid assistant
-            </span>
-          </p>
-        </header>
+      <div className="fixed inset-0 z-0">
+        <BackgroundBeamsWithCollision className="min-h-screen dark">
+          <></>
+        </BackgroundBeamsWithCollision>
+      </div>
 
-        {/* CTA Button */}
-        <SignedIn>
-          <Link href="/dashboard">
-            <button className="group relative inline-flex items-center justify-center px-8 py-3.5 text-base font-medium text-white bg-gradient-to-r from-gray-900 to-gray-800 rounded-full hover:from-gray-800 hover:to-gray-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-              Get Started
-              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-0.5" />
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-gray-900/20 to-gray-800/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-            </button>
-          </Link>
-        </SignedIn>
+      <div className="fixed inset-0 z-10 pointer-events-none overflow-hidden">
+        <Image
+          className="absolute blur-lg opacity-40 w-full top-40 h-[100%] object-center animate-beat"
+          alt="Gradient Background"
+          src={mainFrameSvg}
+        />
+      </div>
 
-        <SignedOut>
-          <SignInButton
-            mode="modal"
-            fallbackRedirectUrl={"/dashboard"}
-            forceRedirectUrl={"/dashboard"}
+      {/* Resizable Navbar */}
+      <Navbar className="fixed top-0">
+        {/* Desktop Navigation */}
+        <NavBody>
+          {/* Logo */}
+          <a
+            href="#"
+            className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1"
           >
-            <button className="group relative inline-flex items-center justify-center px-8 py-3.5 text-base font-medium text-white bg-gradient-to-r from-gray-900 to-gray-800 rounded-full hover:from-gray-800 hover:to-gray-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-              Sign Up
-              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-0.5" />
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-gray-900/20 to-gray-800/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-            </button>
-          </SignInButton>
-        </SignedOut>
+            <Image
+              src={neticsAIM}
+              alt="Netics AI"
+              className="w-full h-16"
+              style={{
+                filter: "brightness(0) invert(1)",
+              }}
+            />
+          </a>
 
-        {/* Features grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16 pt-8 max-w-3xl mx-auto">
-          {[
-            { 
-              title: "All-in-One", 
-              description: "Calendar, expenses, smart home, transport—one app does it all" 
-            },
-            {
-              title: "Truly Smart",
-              description: "Learns your patterns, speaks your language, gets things done",
-            },
-            { 
-              title: "Future-Ready", 
-              description: "Digital today, physical humanoid assistant tomorrow" 
-            },
-          ].map(({ title, description }) => (
-            <div key={title} className="text-center">
-              <div className="text-2xl font-semibold text-gray-900">
-                {title}
-              </div>
-              <div className="text-sm text-gray-600 mt-1">{description}</div>
+          {/* Nav Items */}
+          <NavItems items={navItems} />
+
+          {/* Buttons */}
+          <div className="flex items-center gap-4">
+            <SignedIn>
+              <Link href="/dashboard">
+                <NavbarButton variant="primary">Dashboard</NavbarButton>
+              </Link>
+            </SignedIn>
+
+            <SignedOut>
+              <SignInButton
+                mode="modal"
+                fallbackRedirectUrl={"/dashboard"}
+                forceRedirectUrl={"/dashboard"}
+              >
+                <NavbarButton variant="primary">Sign Up</NavbarButton>
+              </SignInButton>
+            </SignedOut>
+          </div>
+        </NavBody>
+
+        {/* Mobile Navigation */}
+        <MobileNav>
+          <MobileNavHeader>
+            {/* Mobile Logo */}
+            <a href="#" className="flex items-center space-x-2 px-2 py-1">
+              <Image
+                src={neticsAIM}
+                alt="Netics AI"
+                className="w-full h-16"
+                style={{
+                  filter: "brightness(0) invert(1)",
+                }}
+              />
+            </a>
+            <MobileNavToggle
+              isOpen={isMobileMenuOpen}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            />
+          </MobileNavHeader>
+
+          <MobileNavMenu
+            isOpen={isMobileMenuOpen}
+            onClose={() => setIsMobileMenuOpen(false)}
+          >
+            {navItems.map((item, idx) => (
+              <a
+                key={`mobile-link-${idx}`}
+                href={item.link}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="relative text-neutral-600 dark:text-neutral-300"
+              >
+                <span className="block">{item.name}</span>
+              </a>
+            ))}
+            <div className="flex w-full flex-col gap-4">
+              <SignedIn>
+                <Link href="/dashboard">
+                  <NavbarButton
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    variant="primary"
+                    className="w-full"
+                  >
+                    Dashboard
+                  </NavbarButton>
+                </Link>
+              </SignedIn>
+
+              <SignedOut>
+                <SignInButton
+                  mode="modal"
+                  fallbackRedirectUrl={"/dashboard"}
+                  forceRedirectUrl={"/dashboard"}
+                >
+                  <NavbarButton
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    variant="primary"
+                    className="w-full"
+                  >
+                    Sign Up
+                  </NavbarButton>
+                </SignInButton>
+              </SignedOut>
             </div>
-          ))}
+          </MobileNavMenu>
+        </MobileNav>
+      </Navbar>
+
+      {/* Main content */}
+      <section className="relative z-30 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 mt-20 sm:mt-32 md:mt-40 pb-8 sm:pb-12 md:pb-16">
+        <div className="h-[12rem] sm:h-[16rem] md:h-[15rem] flex items-center justify-center w-full max-w-4xl">
+          <TextGradientEffect text="NETICS AI" duration={1} />
         </div>
+        {/* Hero text */}
+        <div className="text-center space-y-4 sm:space-y-6 mb-8 sm:mb-12 md:mb-16">
+          <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight max-w-xs sm:max-w-md md:max-w-3xl mx-auto px-4">
+            Your Revolutionary All-in-one AI Assistant that eliminates
+            app-switching forever
+          </h1>
+
+          <p className="text-sm sm:text-base md:text-lg text-gray-200 max-w-sm sm:max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto px-4">
+            Schedule meetings, track expenses, control smart homes, book
+            transport
+            <br className="hidden sm:block" /> and more—all with simple
+            commands.
+          </p>
+        </div>
+
+        {/* Search input */}
+        <div className="w-full max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-3xl mb-16 sm:mb-24 md:mb-32 px-4 sm:px-0">
+          {/* SEARCH BAR ABOVE */}
+          <div className="relative group -mt-10 z-10">
+            {/* group task */}
+            <div className="flex justify-center relative z-0 -mb-10 sm:-mb-12">
+              <Image src={groupTaskSvg} alt="Group Task" />
+            </div>
+            {/* SEARCH BAR GLASS EFFECT */}
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/40 via-pink-500/40 to-orange-500/40 rounded-full blur-xl sm:blur-2xl opacity-60 group-hover:opacity-80 transition-opacity" />
+            <div className="relative bg-white/10 backdrop-blur-md border border-white/20 rounded-full shadow-2xl flex items-center px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 gap-2 sm:gap-3">
+              <div className="rounded-full flex items-center justify-center flex-shrink-0">
+                <Image
+                  src={neticsAIIm}
+                  alt="Netics AI"
+                  className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full"
+                />
+              </div>
+              <input
+                type="text"
+                placeholder="What do you want to do on Netics?"
+                className="flex-1 px-2 sm:px-3 md:px-4 text-white placeholder-gray-300 bg-transparent outline-none text-sm sm:text-base md:text-lg min-w-0"
+              />
+              <button className="p-1.5 sm:p-2 hover:bg-white/20 rounded-full transition-colors flex-shrink-0">
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-gray-200" />
+              </button>
+              <button className="p-1.5 sm:p-2 hover:bg-white/20 rounded-full transition-colors flex-shrink-0">
+                <Mic className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-gray-200" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer text */}
+        {/* <div className="text-center text-sm text-gray-400 space-x-2 font-medium">
+          <span>Powered by Claude AI & LangChain</span>
+          <span>•</span>
+          <span>Evolving into your physical humanoid assistant</span>
+        </div> */}
       </section>
     </main>
   );

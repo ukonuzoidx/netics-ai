@@ -32,31 +32,33 @@ export default function SettingsPage() {
   return (
     <div className="max-w-4xl mx-auto p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-2">
+        <h1 className="text-3xl font-bold text-neutral-100">Settings</h1>
+        <p className="text-neutral-400 mt-2">
           Manage your connected accounts and preferences
         </p>
       </div>
 
       <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-4 text-gray-900">
+        <h2 className="text-xl font-semibold mb-4 text-neutral-100">
           Connected Accounts
         </h2>
 
         <div className="space-y-4">
           {/* Google Calendar */}
-          <div className="flex items-center justify-between p-4 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between p-4 border border-neutral-800 rounded-lg bg-neutral-900 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <Calendar className="w-6 h-6 text-blue-600" />
+              <div className="p-3 bg-blue-950 rounded-lg">
+                <Calendar className="w-6 h-6 text-blue-400" />
               </div>
               <div>
-                <h3 className="font-medium text-gray-900">Google Calendar</h3>
-                <p className="text-sm text-gray-600">
+                <h3 className="font-medium text-neutral-100">
+                  Google Calendar
+                </h3>
+                <p className="text-sm text-neutral-400">
                   Schedule meetings, check availability, manage events
                 </p>
                 {hasGoogleCalendar && (
-                  <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                  <p className="text-xs text-green-400 mt-1 flex items-center gap-1">
                     <CheckCircle2 className="w-3 h-3" />
                     Connected
                   </p>
@@ -69,16 +71,14 @@ export default function SettingsPage() {
                 size="sm"
                 onClick={() => handleDisconnect("google")}
                 disabled={removing === "google"}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                className="text-red-400 hover:text-red-300 hover:bg-red-950 border-neutral-700"
               >
                 <X className="w-4 h-4 mr-1" />
                 {removing === "google" ? "Disconnecting..." : "Disconnect"}
               </Button>
             ) : (
               <Button
-                onClick={() =>
-                  (window.location.href = "/api/auth/google")
-                }
+                onClick={() => (window.location.href = "/api/auth/google")}
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 Connect
@@ -87,16 +87,16 @@ export default function SettingsPage() {
           </div>
 
           {/* Coming Soon Integrations */}
-          <div className="flex items-center justify-between p-4 border rounded-lg bg-gray-50 opacity-75">
+          <div className="flex items-center justify-between p-4 border border-neutral-800 rounded-lg bg-neutral-900/50 opacity-75">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-gray-200 rounded-lg">
-                <Calendar className="w-6 h-6 text-gray-500" />
+              <div className="p-3 bg-neutral-800 rounded-lg">
+                <Calendar className="w-6 h-6 text-neutral-500" />
               </div>
               <div>
-                <h3 className="font-medium text-gray-700">
+                <h3 className="font-medium text-neutral-300">
                   Microsoft Outlook
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-neutral-500">
                   Coming soon - Outlook calendar integration
                 </p>
               </div>
@@ -106,11 +106,11 @@ export default function SettingsPage() {
             </Button>
           </div>
 
-          <div className="flex items-center justify-between p-4 border rounded-lg bg-gray-50 opacity-75">
+          <div className="flex items-center justify-between p-4 border border-neutral-800 rounded-lg bg-neutral-900/50 opacity-75">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-gray-200 rounded-lg">
+              <div className="p-3 bg-neutral-800 rounded-lg">
                 <svg
-                  className="w-6 h-6 text-gray-500"
+                  className="w-6 h-6 text-neutral-500"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
@@ -118,8 +118,8 @@ export default function SettingsPage() {
                 </svg>
               </div>
               <div>
-                <h3 className="font-medium text-gray-700">Plaid Banking</h3>
-                <p className="text-sm text-gray-500">
+                <h3 className="font-medium text-neutral-300">Plaid Banking</h3>
+                <p className="text-sm text-neutral-500">
                   Coming soon - Track expenses and budgets
                 </p>
               </div>
@@ -131,18 +131,17 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      <section className="border-t pt-8">
-        <h2 className="text-xl font-semibold mb-4 text-gray-900">
+      <section className="border-t border-neutral-800 pt-8">
+        <h2 className="text-xl font-semibold mb-4 text-neutral-100">
           Preferences
         </h2>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-sm text-blue-800">
+        <div className="bg-blue-950 border border-blue-900 rounded-lg p-4">
+          <p className="text-sm text-blue-400">
             <strong>Coming Soon:</strong> Customize your AI assistant with
             preferences for language, timezone, notification settings, and more.
           </p>
         </div>
       </section>
-
     </div>
   );
 }

@@ -5,12 +5,14 @@
 I've installed and configured the foundation for Google Calendar integration:
 
 ### Installed Packages
+
 - ✅ `googleapis` - Google Calendar API client
 - ✅ `@google-cloud/local-auth` - OAuth authentication
 - ✅ `react-speech-recognition` - Voice input (Web Speech API)
 - ✅ `elevenlabs` - Text-to-speech (deprecated, use @elevenlabs/elevenlabs-js)
 
 ### Created Files
+
 - ✅ `convex/integrations.ts` - Database functions for storing OAuth tokens
 - ✅ `convex/schema.ts` - Added integrations table
 - ✅ `app/api/auth/google/route.ts` - OAuth initialization
@@ -20,6 +22,7 @@ I've installed and configured the foundation for Google Calendar integration:
 - ✅ `components/Sidebar.tsx` - Added Settings button
 
 ### Updated Files
+
 - ✅ `.env.example` - Added Google OAuth variables template
 
 ---
@@ -151,7 +154,8 @@ GOOGLE_CLIENT_SECRET=your_client_secret
 GOOGLE_REDIRECT_URI=https://your-domain.com/api/auth/google/callback
 ```
 
-**Important**: 
+**Important**:
+
 - Keep `http://localhost:3000/api/auth/google/callback` in Google Cloud Console for local development
 - Add the production URL as an additional redirect URI (you can have multiple)
 - Update `GOOGLE_REDIRECT_URI` environment variable in production to use HTTPS
@@ -199,25 +203,25 @@ oauth2Client.setCredentials({
   expiry_date: tokens.expiryDate,
 });
 
-const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+const calendar = google.calendar({ version: "v3", auth: oauth2Client });
 
 // Create the event
 const event = {
   summary: params.title,
-  description: params.description || '',
+  description: params.description || "",
   start: {
     dateTime: params.startTime,
-    timeZone: 'America/Los_Angeles', // Get from user preferences
+    timeZone: "America/Los_Angeles", // Get from user preferences
   },
   end: {
     dateTime: params.endTime,
-    timeZone: 'America/Los_Angeles',
+    timeZone: "America/Los_Angeles",
   },
   attendees: params.attendees?.map((email: string) => ({ email })) || [],
 };
 
 const response = await calendar.events.insert({
-  calendarId: 'primary',
+  calendarId: "primary",
   requestBody: event,
 });
 

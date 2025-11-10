@@ -78,7 +78,11 @@ export async function POST(req: Request) {
 
         try {
           // Create the event stream (chatId is optional for voice chat)
-          const eventStream = await submitQuestion(langChainMessages, chatId || null, userId);
+          const eventStream = await submitQuestion(
+            langChainMessages,
+            chatId || null,
+            userId
+          );
 
           // Process the events
           for await (const event of eventStream) {

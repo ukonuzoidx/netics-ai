@@ -5,19 +5,24 @@
 I've added full text-to-speech capabilities to Netics AI using ElevenLabs!
 
 ### 📦 Package Installed
+
 - ✅ `@elevenlabs/elevenlabs-js` (v2.21.0) - Official ElevenLabs SDK
 
 ### 📁 Files Created
+
 - ✅ `app/api/tts/route.ts` - Text-to-speech API endpoint
 
 ### ✏️ Files Updated
+
 1. ✅ `components/ChatInterface.tsx` - Added TTS functionality
+
    - Auto-speak toggle
    - Stop speaking button
    - Speaking animation
    - Automatic speech on AI responses (when enabled)
 
 2. ✅ `components/MessageBubble.tsx` - Added speaker button
+
    - Individual "Speak" button on hover for each AI message
    - Ability to replay any AI response
 
@@ -28,22 +33,26 @@ I've added full text-to-speech capabilities to Netics AI using ElevenLabs!
 ## 🎯 Features Added
 
 ### 1. **Auto-Speak Mode**
+
 - Toggle button at the bottom of the chat
 - When ON: AI responses are automatically spoken
 - When OFF: Manual playback only
 - Persists during the session
 
 ### 2. **Manual Playback**
+
 - Hover over any AI message
 - Click the "Speak" button that appears
 - Replay any message anytime
 
 ### 3. **Stop Control**
+
 - "Stop Speaking" button appears when audio is playing
 - Immediately stops current playback
 - Animated pulse effect for visibility
 
 ### 4. **Speaking Indicator**
+
 - Visual animation shows when AI is speaking
 - Prevents overlapping audio
 - Clean text processing (removes markdown, HTML, code blocks)
@@ -61,6 +70,7 @@ I've added full text-to-speech capabilities to Netics AI using ElevenLabs!
 5. Copy your API key
 
 **Free Tier Includes:**
+
 - 10,000 characters/month
 - All voices available
 - Commercial license
@@ -94,41 +104,49 @@ pnpm dev
 ## 🎨 UI Features
 
 ### Auto-Speak Toggle
+
 ```
 ┌─────────────────────────────┐
 │ 🔊 Auto-speak ON/OFF        │
 └─────────────────────────────┘
 ```
+
 - Blue highlight when ON
 - Gray when OFF
 - Positioned above message input
 
 ### Stop Speaking Button
+
 ```
 ┌─────────────────────────────┐
 │ 🔇 Stop Speaking (animated) │
 └─────────────────────────────┘
 ```
+
 - Red accent color
 - Pulse animation
 - Only shows when speaking
 
 ### Speaking Indicator
+
 ```
 ┌─────────────────────────────┐
 │ ▂▃▅ Speaking...             │
 └─────────────────────────────┘
 ```
+
 - Animated sound bars
 - Blue color scheme
 - Shows current state
 
 ### Message Speaker Button
+
 ```
 ┌──────────────────────────┐
 │ AI Message text...       │  🔊 Speak
 └──────────────────────────┘
 ```
+
 - Appears on hover
 - Only on AI messages
 - Individual playback control
@@ -140,11 +158,13 @@ pnpm dev
 ### Voice Configuration
 
 **Current Settings:**
+
 - Voice: "Rachel" (female, American)
 - Model: "eleven_monolingual_v1"
 - Quality: Standard
 
 **Available Voices** (can change in `app/api/tts/route.ts`):
+
 - Rachel (female, American)
 - Drew (male, American)
 - Clyde (male, American)
@@ -173,6 +193,7 @@ pnpm dev
 ### Text Cleaning
 
 The system automatically removes:
+
 - ✅ Markdown formatting (`#`, `**`, `*`)
 - ✅ HTML tags (`<div>`, `<span>`, etc.)
 - ✅ Code blocks and inline code
@@ -180,6 +201,7 @@ The system automatically removes:
 - ✅ Terminal output (---START--- / ---END---)
 
 ### Audio Format
+
 - Format: MP3
 - Streaming: Yes (efficient for large responses)
 - Caching: Browser-cached audio blobs
@@ -208,11 +230,11 @@ const audio = await elevenlabs.generate({
   text: text,
   model_id: "eleven_multilingual_v2", // Better for non-English
   voice_settings: {
-    stability: 0.5,        // 0-1: Lower = more expressive
+    stability: 0.5, // 0-1: Lower = more expressive
     similarity_boost: 0.75, // 0-1: Higher = closer to original voice
-    style: 0.0,            // 0-1: Style exaggeration
-    use_speaker_boost: true // Enhance clarity
-  }
+    style: 0.0, // 0-1: Style exaggeration
+    use_speaker_boost: true, // Enhance clarity
+  },
 });
 ```
 
@@ -225,17 +247,20 @@ Future enhancement - let users choose their preferred voice in Settings!
 ## 📊 Usage & Costs
 
 ### Free Tier
+
 - 10,000 characters/month
 - ~2,000 words
 - ~20-30 AI responses
 
 ### Paid Plans
+
 - Starter: $5/month → 30,000 characters
-- Creator: $22/month → 100,000 characters  
+- Creator: $22/month → 100,000 characters
 - Pro: $99/month → 500,000 characters
 - Scale: $330/month → 2M characters
 
 ### Cost Estimation
+
 - Average AI response: ~500 characters
 - 1,000 messages ≈ $5-10/month
 
@@ -244,6 +269,7 @@ Future enhancement - let users choose their preferred voice in Settings!
 ## 🎯 What Works Right Now
 
 ### ✅ Fully Functional
+
 - Auto-speak toggle
 - Manual message playback
 - Stop speaking control
@@ -253,6 +279,7 @@ Future enhancement - let users choose their preferred voice in Settings!
 - No audio overlap
 
 ### 🚧 Future Enhancements
+
 - [ ] Voice selection in Settings
 - [ ] Playback speed control
 - [ ] Volume control
@@ -267,29 +294,37 @@ Future enhancement - let users choose their preferred voice in Settings!
 ## 🐛 Troubleshooting
 
 ### "Failed to generate speech"
+
 **Problem:** API key not configured or invalid
-**Solution:** 
+**Solution:**
+
 1. Check `.env.local` has `ELEVENLABS_API_KEY`
 2. Verify key is correct (no extra spaces)
 3. Restart dev server
 
 ### "No audio plays"
+
 **Problem:** Browser audio permissions or autoplay policy
 **Solution:**
+
 1. Check browser console for errors
 2. Try manual playback first (click "Speak" button)
 3. Ensure browser allows audio
 
 ### "Characters used up"
+
 **Problem:** Free tier limit reached
 **Solution:**
+
 1. Upgrade to paid plan
 2. Wait for monthly reset
 3. Use manual playback only (not auto-speak)
 
 ### "Audio sounds robotic"
+
 **Problem:** Using monolingual model
 **Solution:**
+
 - Switch to `eleven_multilingual_v2` model
 - Adjust voice settings (stability, similarity)
 - Try different voices
@@ -302,12 +337,14 @@ Future enhancement - let users choose their preferred voice in Settings!
 **Now:** Full voice output with auto-speak, manual controls, and per-message playback!
 
 ### User Experience Improvements
+
 1. **Accessibility:** Users can listen instead of read
 2. **Multitasking:** Hear responses while doing other things
 3. **Engagement:** More natural conversation feel
 4. **Convenience:** Auto-speak for hands-free use
 
 ### Next Steps
+
 1. Get ElevenLabs API key
 2. Add to `.env.local`
 3. Restart server

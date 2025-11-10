@@ -442,34 +442,47 @@ const academicSearchTool = new DynamicTool({
   func: async (query: string) => {
     try {
       // Use Google Scholar via scraping (be respectful of rate limits)
-      const searchUrl = `https://scholar.google.com/scholar?q=${encodeURIComponent(query)}&hl=en&as_sdt=0,5`;
-      
+      const searchUrl = `https://scholar.google.com/scholar?q=${encodeURIComponent(
+        query
+      )}&hl=en&as_sdt=0,5`;
+
       const response = await fetch(searchUrl, {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        }
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        },
       });
-      
+
       const html = await response.text();
-      
+
       // Extract paper information (basic parsing)
       const papers: any[] = [];
-      const titleMatches = [...html.matchAll(/<h3 class="gs_rt">[\s\S]*?<a[^>]*>([\s\S]*?)<\/a>/g)];
-      const snippetMatches = [...html.matchAll(/<div class="gs_rs">([\s\S]*?)<\/div>/g)];      
+      const titleMatches = [
+        ...html.matchAll(/<h3 class="gs_rt">[\s\S]*?<a[^>]*>([\s\S]*?)<\/a>/g),
+      ];
+      const snippetMatches = [
+        ...html.matchAll(/<div class="gs_rs">([\s\S]*?)<\/div>/g),
+      ];
       for (let i = 0; i < Math.min(5, titleMatches.length); i++) {
-        const title = titleMatches[i][1].replace(/<[^>]+>/g, '').trim();
-        const snippet = snippetMatches[i] ? snippetMatches[i][1].replace(/<[^>]+>/g, '').trim() : '';
+        const title = titleMatches[i][1].replace(/<[^>]+>/g, "").trim();
+        const snippet = snippetMatches[i]
+          ? snippetMatches[i][1].replace(/<[^>]+>/g, "").trim()
+          : "";
         papers.push({
           title,
-          snippet: snippet.substring(0, 200)
+          snippet: snippet.substring(0, 200),
         });
       }
-      
-      return JSON.stringify({
-        query,
-        count: papers.length,
-        papers
-      }, null, 2);
+
+      return JSON.stringify(
+        {
+          query,
+          count: papers.length,
+          papers,
+        },
+        null,
+        2
+      );
     } catch (err) {
       return `Error searching academic papers: ${err}. Try using web_scraper with specific academic URLs instead.`;
     }
@@ -484,35 +497,49 @@ const arxivTool = new DynamicTool({
   func: async (query: string) => {
     try {
       const response = await fetch(
-        `http://export.arxiv.org/api/query?search_query=all:${encodeURIComponent(query)}&start=0&max_results=5`
+        `http://export.arxiv.org/api/query?search_query=all:${encodeURIComponent(
+          query
+        )}&start=0&max_results=5`
       );
       const xml = await response.text();
-      
+
       // Parse XML for entries
       const entries = [...xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)];
-      const papers = entries.map(entry => {
+      const papers = entries.map((entry) => {
         const content = entry[1];
-        const title = content.match(/<title>([\s\S]*?)<\/title>/)?.[1]?.trim().replace(/\s+/g, ' ');
-        const summary = content.match(/<summary>([\s\S]*?)<\/summary>/)?.[1]?.trim().replace(/\s+/g, ' ');
-        const authors = [...content.matchAll(/<author>[\s\S]*?<name>(.*?)<\/name>/g)].map(m => m[1]);
+        const title = content
+          .match(/<title>([\s\S]*?)<\/title>/)?.[1]
+          ?.trim()
+          .replace(/\s+/g, " ");
+        const summary = content
+          .match(/<summary>([\s\S]*?)<\/summary>/)?.[1]
+          ?.trim()
+          .replace(/\s+/g, " ");
+        const authors = [
+          ...content.matchAll(/<author>[\s\S]*?<name>(.*?)<\/name>/g),
+        ].map((m) => m[1]);
         const published = content.match(/<published>(.*?)<\/published>/)?.[1];
         const link = content.match(/<id>(.*?)<\/id>/)?.[1];
-        
+
         return {
           title,
-          authors: authors.join(', '),
-          published: published?.split('T')[0],
-          summary: summary?.substring(0, 300) + '...',
-          link
+          authors: authors.join(", "),
+          published: published?.split("T")[0],
+          summary: summary?.substring(0, 300) + "...",
+          link,
         };
       });
-      
-      return JSON.stringify({
-        query,
-        source: 'arXiv.org',
-        count: papers.length,
-        papers
-      }, null, 2);
+
+      return JSON.stringify(
+        {
+          query,
+          source: "arXiv.org",
+          count: papers.length,
+          papers,
+        },
+        null,
+        2
+      );
     } catch (err) {
       return `Error searching arXiv: ${err}`;
     }
@@ -536,29 +563,29 @@ const calendarTool = new DynamicTool({
   func: async (input: string, runManager) => {
     try {
       const params = JSON.parse(input);
-      console.log('📅 Calendar tool called with params:', params);
-      
+      console.log("📅 Calendar tool called with params:", params);
+
       // Get userId from the global variable
       const userId = currentUserId;
-      
+
       if (!userId) {
         return "Unable to identify user. Please try again.";
       }
-      
-      console.log('👤 User ID:', userId);
-      
+
+      console.log("👤 User ID:", userId);
+
       // Import Convex client dynamically to avoid circular dependencies
       const { getConvexClient } = await import("@/lib/convex");
       const { api } = await import("@/convex/_generated/api");
       const convex = getConvexClient();
-      
+
       // Get user's Google Calendar tokens
-      const tokens = await convex.query(api.integrations.getGoogleTokens, { 
-        userId: userId
+      const tokens = await convex.query(api.integrations.getGoogleTokens, {
+        userId: userId,
       });
-      
-      console.log('🔑 Tokens retrieved:', tokens ? 'Yes' : 'No');
-      
+
+      console.log("🔑 Tokens retrieved:", tokens ? "Yes" : "No");
+
       if (!tokens) {
         return `I need access to your Google Calendar to schedule meetings. Please:
 
@@ -568,26 +595,26 @@ const calendarTool = new DynamicTool({
 
 Once connected, I'll be able to schedule this meeting for you!`;
       }
-      
+
       // Initialize Google Calendar API
       const oauth2Client = new google.auth.OAuth2(
         process.env.GOOGLE_CLIENT_ID,
         process.env.GOOGLE_CLIENT_SECRET,
         process.env.GOOGLE_REDIRECT_URI
       );
-      
+
       oauth2Client.setCredentials({
         access_token: tokens.accessToken,
         refresh_token: tokens.refreshToken,
         expiry_date: tokens.expiryDate,
       });
-      
-      const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
-      
+
+      const calendar = google.calendar({ version: "v3", auth: oauth2Client });
+
       // Create the calendar event
       const event = {
         summary: params.title,
-        description: params.description || '',
+        description: params.description || "",
         start: {
           dateTime: params.startTime,
           timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -598,27 +625,32 @@ Once connected, I'll be able to schedule this meeting for you!`;
         },
         attendees: params.attendees?.map((email: string) => ({ email })) || [],
       };
-      
+
       const response = await calendar.events.insert({
-        calendarId: 'primary',
+        calendarId: "primary",
         requestBody: event,
       });
-      
-      console.log('✅ Calendar event created:', {
+
+      console.log("✅ Calendar event created:", {
         id: response.data.id,
         summary: response.data.summary,
         htmlLink: response.data.htmlLink,
         start: response.data.start,
         end: response.data.end,
       });
-      
+
       return `✅ Meeting scheduled successfully!
 
 📅 **${response.data.summary}**
-🕒 ${new Date(params.startTime).toLocaleString()} - ${new Date(params.endTime).toLocaleTimeString()}
-${params.attendees && params.attendees.length > 0 ? `👥 Attendees: ${params.attendees.join(", ")}\n` : ""}
+🕒 ${new Date(params.startTime).toLocaleString()} - ${new Date(
+        params.endTime
+      ).toLocaleTimeString()}
+${
+  params.attendees && params.attendees.length > 0
+    ? `👥 Attendees: ${params.attendees.join(", ")}\n`
+    : ""
+}
 🔗 [View in Google Calendar](${response.data.htmlLink})`;
-      
     } catch (error: any) {
       console.error("❌ Calendar tool error:", error);
       console.error("Error details:", {
@@ -627,8 +659,8 @@ ${params.attendees && params.attendees.length > 0 ? `👥 Attendees: ${params.at
         errors: error.errors,
         response: error.response?.data,
       });
-      
-      if (error.message?.includes('invalid_grant') || error.code === 401) {
+
+      if (error.message?.includes("invalid_grant") || error.code === 401) {
         return `Your Google Calendar connection has expired. Please:
 
 1. Go to Settings
@@ -637,8 +669,10 @@ ${params.attendees && params.attendees.length > 0 ? `👥 Attendees: ${params.at
 
 Then I'll be able to schedule meetings for you!`;
       }
-      
-      return `Error scheduling meeting: ${error.message || "Unknown error"}. Please try again or check your calendar connection in Settings.`;
+
+      return `Error scheduling meeting: ${
+        error.message || "Unknown error"
+      }. Please try again or check your calendar connection in Settings.`;
     }
   },
 });
@@ -796,13 +830,13 @@ function addCachingHeaders(messages: BaseMessage[]): BaseMessage[] {
 }
 
 export async function submitQuestion(
-  messages: BaseMessage[], 
+  messages: BaseMessage[],
   chatId: string | null,
   userId?: string
 ) {
   // Store userId in global variable for tool access
   currentUserId = userId;
-  
+
   // Add caching headers to messages
   const cachedMessages = addCachingHeaders(messages);
   // console.log("🔒🔒🔒 Messages:", cachedMessages);
@@ -819,7 +853,7 @@ export async function submitQuestion(
     { messages: cachedMessages },
     {
       version: "v2",
-      configurable: { thread_id: chatId || 'voice-session' },
+      configurable: { thread_id: chatId || "voice-session" },
       streamMode: "messages",
       runId: chatId || undefined,
       metadata: { userId }, // Pass userId through metadata

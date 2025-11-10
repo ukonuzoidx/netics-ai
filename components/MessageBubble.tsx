@@ -90,7 +90,7 @@ export function MessageBubble({ content, isUser }: MessageBubbleProps) {
         className={`rounded-2xl px-4 py-2.5 max-w-[85%] md:max-w-[75%] shadow-sm ring-1 ring-inset relative ${
           isUser
             ? "bg-blue-600 text-white rounded-br-none ring-blue-700"
-            : "bg-white text-gray-900 rounded-bl-none ring-gray-200"
+            : "bg-neutral-800 text-neutral-100 rounded-bl-none ring-neutral-700"
         }`}
       >
         {/* Speaker button for AI messages */}
@@ -101,7 +101,7 @@ export function MessageBubble({ content, isUser }: MessageBubbleProps) {
             variant="ghost"
             onClick={handleSpeak}
             disabled={isSpeaking}
-            className="absolute -top-8 right-0 opacity-0 group-hover:opacity-100 transition-opacity h-7 px-2 text-xs bg-white border border-gray-200 hover:bg-gray-50"
+            className="absolute -top-8 right-0 opacity-0 group-hover:opacity-100 transition-opacity h-7 px-2 text-xs bg-neutral-800 border border-neutral-700 hover:bg-neutral-700 text-neutral-300"
           >
             <Volume2 className="w-3 h-3 mr-1" />
             {isSpeaking ? "Speaking..." : "Speak"}
@@ -110,7 +110,9 @@ export function MessageBubble({ content, isUser }: MessageBubbleProps) {
 
         <div className="text-[15px] leading-relaxed prose prose-sm max-w-none prose-headings:mt-3 prose-headings:mb-2 prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5 prose-pre:my-2">
           {isUser ? (
-            <div className="whitespace-pre-wrap text-white">{formattedContent}</div>
+            <div className="whitespace-pre-wrap text-white">
+              {formattedContent}
+            </div>
           ) : (
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
@@ -118,49 +120,67 @@ export function MessageBubble({ content, isUser }: MessageBubbleProps) {
               components={{
                 // Style headings
                 h1: ({ children }) => (
-                  <h1 className="text-xl font-bold text-gray-900 mt-4 mb-2">{children}</h1>
+                  <h1 className="text-xl font-bold text-neutral-100 mt-4 mb-2">
+                    {children}
+                  </h1>
                 ),
                 h2: ({ children }) => (
-                  <h2 className="text-lg font-bold text-gray-900 mt-3 mb-2">{children}</h2>
+                  <h2 className="text-lg font-bold text-neutral-100 mt-3 mb-2">
+                    {children}
+                  </h2>
                 ),
                 h3: ({ children }) => (
-                  <h3 className="text-base font-semibold text-gray-900 mt-2 mb-1">{children}</h3>
+                  <h3 className="text-base font-semibold text-neutral-100 mt-2 mb-1">
+                    {children}
+                  </h3>
                 ),
                 // Style lists
                 ul: ({ children }) => (
-                  <ul className="list-disc list-inside space-y-1 my-2">{children}</ul>
+                  <ul className="list-disc list-inside space-y-1 my-2">
+                    {children}
+                  </ul>
                 ),
                 ol: ({ children }) => (
-                  <ol className="list-decimal list-inside space-y-1 my-2">{children}</ol>
+                  <ol className="list-decimal list-inside space-y-1 my-2">
+                    {children}
+                  </ol>
                 ),
                 li: ({ children }) => (
-                  <li className="text-gray-900 ml-2">{children}</li>
+                  <li className="text-neutral-100 ml-2">{children}</li>
                 ),
                 // Style paragraphs
                 p: ({ children }) => (
-                  <p className="text-gray-900 my-2">{children}</p>
+                  <p className="text-neutral-100 my-2">{children}</p>
                 ),
                 // Style code blocks
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 code: ({ inline, children, ...props }: any) =>
                   inline ? (
-                    <code className="bg-gray-100 text-red-600 px-1 py-0.5 rounded text-sm font-mono" {...props}>
+                    <code
+                      className="bg-neutral-900 text-blue-400 px-1 py-0.5 rounded text-sm font-mono"
+                      {...props}
+                    >
                       {children}
                     </code>
                   ) : (
-                    <code className="block bg-gray-100 p-2 rounded text-sm font-mono overflow-x-auto" {...props}>
+                    <code
+                      className="block bg-neutral-900 p-2 rounded text-sm font-mono overflow-x-auto"
+                      {...props}
+                    >
                       {children}
                     </code>
                   ),
                 // Style strong/bold
                 strong: ({ children }) => (
-                  <strong className="font-bold text-gray-900">{children}</strong>
+                  <strong className="font-bold text-neutral-100">
+                    {children}
+                  </strong>
                 ),
                 // Style links
                 a: ({ children, href }) => (
                   <a
                     href={href}
-                    className="text-blue-600 hover:underline"
+                    className="text-blue-400 hover:underline"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -182,7 +202,9 @@ export function MessageBubble({ content, isUser }: MessageBubbleProps) {
         >
           <div
             className={`w-8 h-8 rounded-full border-2 ${
-              isUser ? "bg-white border-gray-100" : "bg-blue-600 border-white"
+              isUser
+                ? "bg-neutral-800 border-neutral-700"
+                : "bg-blue-600 border-neutral-800"
             } flex items-center justify-center shadow-sm`}
           >
             {isUser ? (
