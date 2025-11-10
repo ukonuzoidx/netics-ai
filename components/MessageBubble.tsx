@@ -100,7 +100,7 @@ export function MessageBubble({ content, isUser }: MessageBubbleProps) {
             type="button"
             size="sm"
             variant="ghost"
-            onClick={() => handleSpeak(content)}
+            onClick={handleSpeak}
             disabled={isSpeaking}
             className="absolute -top-8 right-0 opacity-0 group-hover:opacity-100 transition-opacity h-7 px-2 text-xs bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300"
           >
