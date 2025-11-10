@@ -1,17 +1,13 @@
 "use client";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
-import { ArrowRight, Mic, Plus } from "lucide-react";
+import { Mic, Plus } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import mainFrameSvg from "../public/gradient/main-frame-1.svg";
 import neticsAIIm from "../public/netics_ai.png";
 import neticsAIM from "../public/netics_ai_main_logo.png";
 import groupTaskSvg from "../public/group_task.svg";
-import rightYellow from "../public/gradient/right-yellow.svg";
-import centerPurple from "../public/gradient/center-purple.svg";
-import rightRed from "../public/gradient/right-red.svg";
 import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
-import { TextHoverEffect } from "@/components/ui/text-hover-effect";
 import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
 import {
   Navbar,
@@ -48,13 +44,13 @@ export default function LandingPage() {
         </BackgroundBeamsWithCollision>
       </div>
 
-      <div className="fixed inset-0 z-10 pointer-events-none overflow-hidden">
+      {/* <div className="fixed inset-0 z-10 pointer-events-none overflow-hidden">
         <Image
           className="absolute blur-lg opacity-40 w-full top-40 h-[100%] object-center animate-beat"
           alt="Gradient Background"
           src={mainFrameSvg}
         />
-      </div>
+      </div> */}
 
       {/* Resizable Navbar */}
       <Navbar className="fixed top-0">

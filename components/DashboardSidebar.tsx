@@ -3,16 +3,12 @@
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Button } from "@/components/ui/button";
-import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
+import { PlusIcon } from "@radix-ui/react-icons";
 import { Settings, Phone, MessageSquare, User, Search } from "lucide-react";
-import TimeAgo from "react-timeago";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
-import { useNavigation } from "@/lib/context/navigation";
-import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
+import { Sidebar, SidebarBody } from "@/components/ui/sidebar";
 import { useState } from "react";
-import { motion } from "motion/react";
 import Image from "next/image";
 import { useUser } from "@clerk/nextjs";
 import neticsAIM from "../public/netics_ai_main_logo.png";

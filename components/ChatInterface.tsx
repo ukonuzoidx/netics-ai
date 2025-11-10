@@ -117,6 +117,7 @@ export default function ChatInterface({
 
     try {
       setIsSpeaking(true);
+      console.log("🎤 AI Speaking started - isSpeaking:", true);
 
       const response = await fetch("/api/tts", {
         method: "POST",
@@ -145,6 +146,7 @@ export default function ChatInterface({
 
       audio.onended = () => {
         setIsSpeaking(false);
+        console.log("🎤 AI Speaking ended - isSpeaking:", false);
         URL.revokeObjectURL(audioUrl);
       };
 
@@ -405,12 +407,18 @@ export default function ChatInterface({
       </section>
 
       {/* Input form */}
-      <footer className="border-t border-neutral-800 bg-neutral-900 p-4 relative overflow-hidden">
+      <footer className="border-t border-neutral-800 bg-neutral-900 p-4 relative">
         {/* Animated gradient blob when AI is speaking */}
         {isSpeaking && (
-          <div className="absolute -top-32 left-0 right-0 h-64 pointer-events-none">
-            <div className="absolute inset-0 ai-speaking-gradient opacity-40 blur-3xl"></div>
-          </div>
+          <>
+            <div className="absolute -top-24 left-0 right-0 h-48 pointer-events-none z-0">
+              <div className="absolute inset-0 ai-speaking-gradient"></div>
+            </div>
+            {/* Debug indicator */}
+            <div className="absolute top-1 right-4 z-50 bg-green-500 text-white text-xs px-2 py-1 rounded">
+              AI Speaking
+            </div>
+          </>
         )}
         
         <form onSubmit={handleSubmit} className="max-w-4xl mx-auto relative z-10">
