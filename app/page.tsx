@@ -3,7 +3,6 @@ import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import { Mic, Plus } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import mainFrameSvg from "../public/gradient/main-frame-1.svg";
 import neticsAIIm from "../public/netics_ai.png";
 import neticsAIM from "../public/netics_ai_main_logo.png";
 import groupTaskSvg from "../public/group_task.svg";

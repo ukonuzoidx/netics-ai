@@ -4,19 +4,17 @@ import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { PlusIcon } from "@radix-ui/react-icons";
-import { Settings, Phone, MessageSquare, User, Search } from "lucide-react";
+import { Settings, Phone, Search } from "lucide-react";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
 import { Sidebar, SidebarBody } from "@/components/ui/sidebar";
 import { useState } from "react";
 import Image from "next/image";
-import { useUser } from "@clerk/nextjs";
 import neticsAIM from "../public/netics_ai_main_logo.png";
 import neticsAIsm from "../public/NeticsAISmall.png";
 
 export default function DashboardSidebar() {
   const router = useRouter();
-  const { user } = useUser();
   const [open, setOpen] = useState(false);
   const chats = useQuery(api.chats.listChats);
   const createChat = useMutation(api.chats.createChat);

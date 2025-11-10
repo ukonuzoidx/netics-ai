@@ -420,8 +420,11 @@ export default function ChatInterface({
             </div>
           </>
         )}
-        
-        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto relative z-10">
+
+        <form
+          onSubmit={handleSubmit}
+          className="max-w-4xl mx-auto relative z-10"
+        >
           {/* Voice controls */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -532,7 +535,6 @@ export default function ChatInterface({
             </Button>
           </div>
         </form>
-    
       </footer>
     </main>
   );
