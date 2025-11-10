@@ -34,7 +34,7 @@ export default function DashboardSidebar() {
 
   return (
     <Sidebar open={open} setOpen={setOpen}>
-      <SidebarBody className="justify-between gap-0 bg-black">
+      <SidebarBody className="justify-between gap-0 bg-white dark:bg-black border-r border-neutral-200 dark:border-neutral-800">
         <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
           {/* Logo */}
           {open ? <Logo /> : <LogoIcon />}
@@ -57,15 +57,19 @@ export default function DashboardSidebar() {
               <button
                 onClick={handleNewChat}
                 className={cn(
-                  " w-full px-4 justify-center gap-2 flex items-center py-2.5 rounded-lg border border-neutral-700 hover:bg-neutral-900 transition-colors"
+                  " w-full px-4 justify-center gap-2 flex items-center py-2.5 rounded-lg border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
                 )}
               >
-                <PlusIcon className="h-5 w-5 text-white shrink-0" />
-                {open && <span className="text-sm text-white">New Chat</span>}
+                <PlusIcon className="h-5 w-5 text-neutral-900 dark:text-white shrink-0" />
+                {open && (
+                  <span className="text-sm text-neutral-900 dark:text-white">
+                    New Chat
+                  </span>
+                )}
               </button>
             ) : (
-              <button className="w-7 flex items-center justify-center py-2 rounded-full bg-neutral-700 hover:bg-neutral-900 transition-colors">
-                <PlusIcon className="h-3 w-3 text-white shrink-0" />
+              <button className="w-7 flex items-center justify-center py-2 rounded-full bg-neutral-300 dark:bg-neutral-700 hover:bg-neutral-400 dark:hover:bg-neutral-900 transition-colors">
+                <PlusIcon className="h-3 w-3 text-neutral-900 dark:text-white shrink-0" />
               </button>
             )}
           </div>
@@ -74,16 +78,16 @@ export default function DashboardSidebar() {
           <div className="mt-4 px-3">
             {open ? (
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500 dark:text-neutral-500" />
                 <input
                   type="text"
                   placeholder="Search"
-                  className="w-full pl-10 pr-3 py-2 rounded-lg bg-neutral-900 border border-neutral-800 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-700"
+                  className="w-full pl-10 pr-3 py-2 rounded-lg bg-neutral-100 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 text-sm text-neutral-900 dark:text-white placeholder:text-neutral-500 dark:placeholder:text-neutral-500 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-700"
                 />
               </div>
             ) : (
-              <button className="w-full flex items-center justify-center py-2 rounded-lg hover:bg-neutral-900 transition-colors">
-                <Search className="h-5 w-5 text-white shrink-0" />
+              <button className="w-full flex items-center justify-center py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors">
+                <Search className="h-5 w-5 text-neutral-900 dark:text-white shrink-0" />
               </button>
             )}
           </div>
@@ -93,12 +97,16 @@ export default function DashboardSidebar() {
             <button
               onClick={() => router.push("/dashboard/voice")}
               className={cn(
-                "w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-neutral-900 transition-colors",
+                "w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors",
                 !open && "justify-center px-0"
               )}
             >
-              <Phone className="h-5 w-5 text-white shrink-0" />
-              {open && <span className="text-sm text-white">Voice Chat</span>}
+              <Phone className="h-5 w-5 text-neutral-900 dark:text-white shrink-0" />
+              {open && (
+                <span className="text-sm text-neutral-900 dark:text-white">
+                  Voice Chat
+                </span>
+              )}
             </button>
           </div>
 
@@ -106,10 +114,10 @@ export default function DashboardSidebar() {
           {open && (
             <div className="mt-6 flex-1 overflow-y-auto px-3">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-medium text-neutral-400">
+                <p className="text-xs font-medium text-neutral-600 dark:text-neutral-400">
                   Recent Chats
                 </p>
-                <button className="text-neutral-400 hover:text-white">
+                <button className="text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -144,12 +152,16 @@ export default function DashboardSidebar() {
           <button
             onClick={() => router.push("/dashboard/settings")}
             className={cn(
-              "w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-neutral-900 transition-colors",
+              "w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors",
               !open && "justify-center px-0"
             )}
           >
-            <Settings className="h-5 w-5 text-white shrink-0" />
-            {open && <span className="text-sm text-white">Settings</span>}
+            <Settings className="h-5 w-5 text-neutral-900 dark:text-white shrink-0" />
+            {open && (
+              <span className="text-sm text-neutral-900 dark:text-white">
+                Settings
+              </span>
+            )}
           </button>
         </div>
       </SidebarBody>
@@ -163,7 +175,11 @@ const Logo = () => {
       href="/dashboard"
       className="relative z-20 flex items-center justify-center px-3 py-4"
     >
-      <Image src={neticsAIM} alt="Netics AI" className="w-full h-20" />
+      <Image
+        src={neticsAIM}
+        alt="Netics AI"
+        className="w-full h-20 dark:[filter:brightness(0)_invert(1)]"
+      />
     </a>
   );
 };
@@ -198,11 +214,11 @@ function ChatRow({
 
   return (
     <div
-      className="group rounded-lg px-3 py-2.5 hover:bg-neutral-900 transition-colors cursor-pointer relative"
+      className="group rounded-lg px-3 py-2.5 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors cursor-pointer relative"
       onClick={handleClick}
     >
       <div className="flex items-start justify-between gap-2">
-        <p className="text-sm text-neutral-300 truncate flex-1">
+        <p className="text-sm text-neutral-700 dark:text-neutral-300 truncate flex-1">
           {lastMessage
             ? lastMessage.content.substring(0, 35) +
               (lastMessage.content.length > 35 ? "..." : "")
@@ -225,7 +241,7 @@ function ChatRow({
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-neutral-500 hover:text-neutral-300"
+            className="text-neutral-500 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
           >
             <circle cx="12" cy="12" r="1" />
             <circle cx="19" cy="12" r="1" />

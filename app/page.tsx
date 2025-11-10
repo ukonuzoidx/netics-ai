@@ -1,10 +1,11 @@
 "use client";
-import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, useAuth } from "@clerk/nextjs";
 import { Mic, Plus } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import neticsAIIm from "../public/netics_ai.png";
 import neticsAIM from "../public/netics_ai_main_logo.png";
+import neticsAIsm from "../public/NeticsAISmall.png";
 import groupTaskSvg from "../public/group_task.svg";
 import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
 import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
@@ -18,11 +19,20 @@ import {
   MobileNavToggle,
   MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TextGradientEffect } from "@/components/ui/text-gradient-effect";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useRouter } from "next/navigation";
 
 export default function LandingPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { isSignedIn } = useAuth();
+  const createChat = useMutation(api.chats.createChat);
+  const router = useRouter();
 
   const navItems = [
     { name: "Chat", link: "#chat" },
@@ -30,15 +40,52 @@ export default function LandingPage() {
     { name: "About", link: "#about" },
   ];
 
+  const handleInputSubmit = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== "Enter" || !inputValue.trim() || isLoading) return;
+
+    setIsLoading(true);
+
+    try {
+      if (!isSignedIn) {
+        // Store the input in localStorage to use after sign in
+        localStorage.setItem("pendingChatMessage", inputValue);
+        // Store flag to know user came from landing page input
+        localStorage.setItem("fromLandingPageInput", "true");
+        // Trigger sign in - the user will be redirected back after
+        const signInButton = document.querySelector('[data-clerk-sign-in]') as HTMLButtonElement;
+        signInButton?.click();
+        
+        // Reset loading after a short delay (user might cancel)
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1000);
+        return;
+      }
+
+      // User is signed in, create chat with their message
+      const chatId = await createChat({ title: inputValue.slice(0, 50) });
+      
+      // Store the message to send once in chat
+      localStorage.setItem("pendingChatMessage", inputValue);
+      localStorage.setItem("fromLandingPageInput", "true");
+      
+      // Navigate to the new chat
+      router.push(`/dashboard/chat/${chatId}`);
+    } catch (error) {
+      console.error("Error creating chat:", error);
+      setIsLoading(false);
+    }
+  };
+
   return (
     <main className="w-full min-h-screen relative overflow-hidden">
       {/* Gradient Background - Layer 2 (middle) */}
-      <div className="text-gray-800">
+      <div className="text-gray-200 dark:text-gray-800">
         <BackgroundRippleEffect rows={10} cols={20} cellSize={280} />
       </div>
 
       <div className="fixed inset-0 z-0">
-        <BackgroundBeamsWithCollision className="min-h-screen dark">
+        <BackgroundBeamsWithCollision className="min-h-screen">
           <></>
         </BackgroundBeamsWithCollision>
       </div>
@@ -63,10 +110,7 @@ export default function LandingPage() {
             <Image
               src={neticsAIM}
               alt="Netics AI"
-              className="w-full h-16"
-              style={{
-                filter: "brightness(0) invert(1)",
-              }}
+              className="w-full h-16 dark:[filter:brightness(0)_invert(1)]"
             />
           </a>
 
@@ -75,6 +119,8 @@ export default function LandingPage() {
 
           {/* Buttons */}
           <div className="flex items-center gap-4">
+            <ThemeToggle />
+
             <SignedIn>
               <Link href="/dashboard">
                 <NavbarButton variant="primary">Dashboard</NavbarButton>
@@ -87,7 +133,7 @@ export default function LandingPage() {
                 fallbackRedirectUrl={"/dashboard"}
                 forceRedirectUrl={"/dashboard"}
               >
-                <NavbarButton variant="primary">Sign Up</NavbarButton>
+                <NavbarButton variant="primary" data-clerk-sign-in>Sign Up</NavbarButton>
               </SignInButton>
             </SignedOut>
           </div>
@@ -101,10 +147,7 @@ export default function LandingPage() {
               <Image
                 src={neticsAIM}
                 alt="Netics AI"
-                className="w-full h-16"
-                style={{
-                  filter: "brightness(0) invert(1)",
-                }}
+                className="w-full h-10 dark:[filter:brightness(0)_invert(1)]"
               />
             </a>
             <MobileNavToggle
@@ -167,12 +210,12 @@ export default function LandingPage() {
         </div>
         {/* Hero text */}
         <div className="text-center space-y-4 sm:space-y-6 mb-8 sm:mb-12 md:mb-16">
-          <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight max-w-xs sm:max-w-md md:max-w-3xl mx-auto px-4">
+          <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white leading-tight max-w-xs sm:max-w-md md:max-w-3xl mx-auto px-4">
             Your Revolutionary All-in-one AI Assistant that eliminates
             app-switching forever
           </h1>
 
-          <p className="text-sm sm:text-base md:text-lg text-gray-200 max-w-sm sm:max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto px-4">
+          <p className="text-sm sm:text-base md:text-lg text-neutral-400 dark:text-neutral-100 max-w-sm sm:max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto px-4">
             Schedule meetings, track expenses, control smart homes, book
             transport
             <br className="hidden sm:block" /> and more—all with simple
@@ -201,13 +244,17 @@ export default function LandingPage() {
               <input
                 type="text"
                 placeholder="What do you want to do on Netics?"
-                className="flex-1 px-2 sm:px-3 md:px-4 text-white placeholder-gray-300 bg-transparent outline-none text-sm sm:text-base md:text-lg min-w-0"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={handleInputSubmit}
+                disabled={isLoading}
+                className="flex-1 px-2 sm:px-3 md:px-4 text-neutral-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 bg-transparent outline-none text-sm sm:text-base md:text-lg min-w-0 disabled:opacity-50"
               />
               <button className="p-1.5 sm:p-2 hover:bg-white/20 rounded-full transition-colors flex-shrink-0">
-                <Plus className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-gray-200" />
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-neutral-900 dark:text-white" />
               </button>
               <button className="p-1.5 sm:p-2 hover:bg-white/20 rounded-full transition-colors flex-shrink-0">
-                <Mic className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-gray-200" />
+                <Mic className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-neutral-900 dark:text-white" />
               </button>
             </div>
           </div>

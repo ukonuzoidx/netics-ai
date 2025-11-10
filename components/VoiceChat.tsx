@@ -460,7 +460,7 @@ export default function VoiceChat() {
   }, []);
 
   return (
-    <div className="flex flex-col h-full items-center justify-center p-8 bg-neutral-950">
+    <div className="flex flex-col h-full items-center justify-center p-8 bg-neutral-50 dark:bg-neutral-950">
       <div className="max-w-2xl w-full space-y-8">
         <div className="text-center space-y-4">
           <div
@@ -473,7 +473,7 @@ export default function VoiceChat() {
                   : isRecording
                   ? "bg-red-950 ring-8 ring-red-500/20 animate-pulse"
                   : "bg-green-950 ring-8 ring-green-500/20"
-                : "bg-neutral-900"
+                : "bg-neutral-200 dark:bg-neutral-900"
             }`}
           >
             {isCallActive ? (
@@ -484,18 +484,18 @@ export default function VoiceChat() {
               ) : isRecording ? (
                 <Mic className="w-16 h-16 text-red-400" />
               ) : (
-                <MicOff className="w-16 h-16 text-neutral-500" />
+                <MicOff className="w-16 h-16 text-neutral-500 dark:text-neutral-500" />
               )
             ) : (
-              <Phone className="w-16 h-16 text-neutral-500" />
+              <Phone className="w-16 h-16 text-neutral-600 dark:text-neutral-500" />
             )}
           </div>
 
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold bg-gradient-to-br from-neutral-100 to-neutral-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold bg-gradient-to-br from-neutral-900 to-neutral-600 dark:from-neutral-100 dark:to-neutral-400 bg-clip-text text-transparent">
               {isCallActive ? "Voice Chat Active" : "Voice Chat"}
             </h1>
-            <p className="text-neutral-400">
+            <p className="text-neutral-600 dark:text-neutral-400">
               {isCallActive
                 ? isAiSpeaking
                   ? "AI is speaking..."
@@ -507,7 +507,7 @@ export default function VoiceChat() {
                 : "Start a voice conversation with AI"}
             </p>
             {currentTranscript && !isAiSpeaking && (
-              <p className="text-sm text-neutral-500 italic">
+              <p className="text-sm text-neutral-500 dark:text-neutral-500 italic">
                 Last: &quot;{currentTranscript}&quot;
               </p>
             )}
@@ -557,8 +557,8 @@ export default function VoiceChat() {
         </div>
 
         {isCallActive && conversation.length > 0 && (
-          <div className="bg-neutral-900 rounded-2xl border border-neutral-800 p-6 max-h-96 overflow-y-auto space-y-4">
-            <h3 className="text-sm font-medium text-neutral-400 mb-4">
+          <div className="bg-neutral-100 dark:bg-neutral-900 rounded-2xl border border-neutral-300 dark:border-neutral-800 p-6 max-h-96 overflow-y-auto space-y-4">
+            <h3 className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-4">
               Conversation
             </h3>
             {conversation.map((msg, idx) => (
@@ -572,7 +572,7 @@ export default function VoiceChat() {
                   className={`px-4 py-2 rounded-2xl max-w-[80%] ${
                     msg.role === "user"
                       ? "bg-blue-500 text-white"
-                      : "bg-neutral-800 text-neutral-100"
+                      : "bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100"
                   }`}
                 >
                   <p className="text-sm">{msg.text}</p>
@@ -583,9 +583,9 @@ export default function VoiceChat() {
         )}
 
         {!isCallActive && (
-          <div className="bg-neutral-900 rounded-2xl border border-neutral-800 p-6 space-y-3">
-            <h3 className="font-medium text-neutral-100">How it works:</h3>
-            <ul className="space-y-2 text-sm text-neutral-400">
+          <div className="bg-neutral-100 dark:bg-neutral-900 rounded-2xl border border-neutral-300 dark:border-neutral-800 p-6 space-y-3">
+            <h3 className="font-medium text-neutral-900 dark:text-neutral-100">How it works:</h3>
+            <ul className="space-y-2 text-sm text-neutral-700 dark:text-neutral-400">
               <li className="flex items-start gap-2">
                 <span className="text-green-500 mt-0.5">●</span>
                 Click &quot;Start Voice Chat&quot; to begin

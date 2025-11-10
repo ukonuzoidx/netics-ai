@@ -25,18 +25,18 @@ export default function RootLayout({
 }>) {
   return (
     <ConvexClientProvider>
-      <html lang="en" className="dark" style={{ colorScheme: 'dark' }} suppressHydrationWarning>
+      <html lang="en" className="dark" suppressHydrationWarning>
         <head>
-          <meta name="color-scheme" content="dark only" />
+          <meta name="color-scheme" content="dark light" />
           <meta name="theme-color" content="#0a0a0a" />
           <script
             dangerouslySetInnerHTML={{
               __html: `
                 (function() {
                   try {
-                    document.documentElement.classList.add('dark');
-                    document.documentElement.style.colorScheme = 'dark';
-                    localStorage.setItem('theme', 'dark');
+                    const theme = localStorage.getItem('theme') || 'dark';
+                    document.documentElement.classList.toggle('dark', theme === 'dark');
+                    document.documentElement.style.colorScheme = theme;
                   } catch (e) {}
                 })();
               `,
@@ -44,8 +44,7 @@ export default function RootLayout({
           />
         </head>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-950 text-neutral-50`}
-          style={{ backgroundColor: '#0a0a0a', color: '#fafafa' }}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
           suppressHydrationWarning
         >
           {children}

@@ -33,6 +33,8 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
   const [isToolExecuting, setIsToolExecuting] = useState(false);
   const [autoSpeak, setAutoSpeak] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const hasSentPendingMessage = useRef(false);
 
   // Speech recognition setup
   const {
@@ -48,6 +50,27 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
       setInput(transcript);
     }
   }, [transcript]);
+
+  // Check for pending message from landing page
+  useEffect(() => {
+    if (hasSentPendingMessage.current) return;
+    
+    const pendingMessage = localStorage.getItem("pendingChatMessage");
+    const fromLandingPage = localStorage.getItem("fromLandingPageInput");
+    
+    if (pendingMessage && fromLandingPage === "true" && messages.length === 0 && !isLoading) {
+      // Only auto-send if this is a new chat with no messages AND user came from landing page
+      setInput(pendingMessage);
+      localStorage.removeItem("pendingChatMessage");
+      localStorage.removeItem("fromLandingPageInput");
+      hasSentPendingMessage.current = true;
+      
+      // Auto-submit the message after a brief delay
+      setTimeout(() => {
+        formRef.current?.requestSubmit();
+      }, 500);
+    }
+  }, [messages.length, isLoading]);
 
   // Start/stop voice recording
   const toggleListening = () => {
@@ -95,7 +118,7 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
     return `---START---\n${terminalHtml}\n---END---`;
   };
 
-    // Text-to-speech function
+  // Text-to-speech function
   const speakText = async (text: string) => {
     if (!text || isSpeaking) return;
 
@@ -112,7 +135,10 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
 
     if (!cleanText || cleanText.length < 3) return;
 
-    console.log("🎤 Starting TTS for text:", cleanText.substring(0, 50) + "...");
+    console.log(
+      "🎤 Starting TTS for text:",
+      cleanText.substring(0, 50) + "..."
+    );
 
     try {
       const response = await fetch("/api/tts", {
@@ -128,7 +154,7 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
 
       const audioBlob = await response.blob();
       console.log("🎵 Audio blob received, size:", audioBlob.size, "bytes");
-      
+
       if (audioBlob.size < 100) {
         console.error("❌ Audio too small, likely empty");
         return;
@@ -167,16 +193,16 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
       // Start speaking state and play audio
       startSpeaking();
       console.log("🎤 Speaking state started, now playing audio...");
-      
+
       // Wait a tiny bit for state to update before playing
-      await new Promise(resolve => setTimeout(resolve, 50));
-      
-      await audio.play().catch(err => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      await audio.play().catch((err) => {
         console.error("❌ Play error:", err);
         stopSpeaking();
         URL.revokeObjectURL(audioUrl);
       });
-      
+
       console.log("✅ Audio play() called successfully");
     } catch (error) {
       console.error("❌ Text-to-speech error:", error);
@@ -369,7 +395,7 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
   return (
     <main className="flex flex-col h-[calc(100vh-theme(spacing.14))]">
       {/* Messages container */}
-      <section className="flex-1 overflow-y-auto bg-neutral-950 p-2 md:p-0">
+      <section className="flex-1 overflow-y-auto bg-neutral-50 dark:bg-neutral-950 p-2 md:p-0">
         <div className="max-w-4xl mx-auto p-4 space-y-3">
           {messages?.length === 0 && <WelcomeMessage />}
 
@@ -386,7 +412,7 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
           {/* Tool execution indicator */}
           {isToolExecuting && (
             <div className="flex justify-start animate-in fade-in-0">
-              <div className="rounded-2xl px-4 py-3 bg-neutral-800 text-neutral-100 rounded-bl-none shadow-sm ring-1 ring-inset ring-neutral-700">
+              <div className="rounded-2xl px-4 py-3 bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 rounded-bl-none shadow-sm ring-1 ring-inset ring-neutral-300 dark:ring-neutral-700">
                 <div className="flex items-center gap-2">
                   <div className="flex gap-1.5">
                     {[0.3, 0.15, 0].map((delay, i) => (
@@ -397,7 +423,7 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
                       />
                     ))}
                   </div>
-                  <span className="text-sm text-neutral-300">
+                  <span className="text-sm text-neutral-700 dark:text-neutral-300">
                     {currentTool?.name
                       ? `Using ${currentTool.name}...`
                       : "Processing..."}
@@ -410,7 +436,7 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
           {/* Loading indicator */}
           {isLoading && !streamedResponse && !isToolExecuting && (
             <div className="flex justify-start animate-in fade-in-0">
-              <div className="rounded-2xl px-4 py-3 bg-neutral-800 text-neutral-100 rounded-bl-none shadow-sm ring-1 ring-inset ring-neutral-700">
+              <div className="rounded-2xl px-4 py-3 bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 rounded-bl-none shadow-sm ring-1 ring-inset ring-neutral-300 dark:ring-neutral-700">
                 <div className="flex items-center gap-1.5">
                   {[0.3, 0.15, 0].map((delay, i) => (
                     <div
@@ -429,7 +455,7 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
 
       {/* Audio Visualizer - DJ Style (separate from input) */}
       {isSpeaking && (
-        <div className="border-t border-neutral-800 bg-black py-8">
+        <div className="border-t border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-black py-8">
           <div className="max-w-4xl mx-auto px-4">
             {/* Audio visualizer bars - like DJ speakers with GLOW */}
             <div className="flex items-end justify-center gap-3 h-32">
@@ -447,7 +473,7 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
                       0 0 40px rgba(236, 72, 153, 0.6),
                       0 0 60px rgba(59, 130, 246, 0.4)
                     `,
-                    minHeight: '20px',
+                    minHeight: "20px",
                     animationDelay: `${i * 0.05}s`,
                     animationDuration: `${0.5 + Math.random() * 0.4}s`,
                   }}
@@ -464,11 +490,8 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
       )}
 
       {/* Input form */}
-      <footer className="border-t border-neutral-800 bg-neutral-900 p-4">
-        <form
-          onSubmit={handleSubmit}
-          className="max-w-4xl mx-auto"
-        >
+      <footer className="border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
+        <form ref={formRef} onSubmit={handleSubmit} className="max-w-4xl mx-auto">
           {/* Voice controls */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -480,7 +503,7 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
                 className={`text-xs ${
                   autoSpeak
                     ? "bg-blue-950 text-blue-400 border-blue-800"
-                    : "text-neutral-400 border-neutral-700"
+                    : "text-neutral-700 dark:text-neutral-400 border-neutral-300 dark:border-neutral-700"
                 }`}
               >
                 <Volume2 className="w-3.5 h-3.5 mr-1.5" />
@@ -542,7 +565,7 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
                 className={`rounded-xl h-11 w-11 p-0 flex items-center justify-center transition-all ${
                   listening
                     ? "bg-red-500 hover:bg-red-600 text-white animate-pulse"
-                    : "bg-neutral-800 hover:bg-neutral-700 text-neutral-400"
+                    : "bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-400"
                 }`}
                 title={listening ? "Stop listening" : "Start voice input"}
               >
@@ -559,10 +582,10 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={listening ? "Listening..." : "Message AI Agent..."}
-              className={`flex-1 py-3 px-4 rounded-2xl border focus:outline-none focus:ring-2 focus:border-transparent pr-12 placeholder:text-neutral-500 ${
+              className={`flex-1 py-3 px-4 rounded-2xl border focus:outline-none focus:ring-2 focus:border-transparent pr-12 placeholder:text-neutral-500 dark:placeholder:text-neutral-500 ${
                 listening
                   ? "border-red-700 focus:ring-red-500 bg-red-950/50 animate-pulse text-neutral-100"
-                  : "border-neutral-700 focus:ring-blue-500 bg-neutral-800 text-neutral-100"
+                  : "border-neutral-300 dark:border-neutral-700 focus:ring-blue-500 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100"
               }`}
               disabled={isLoading}
             />
@@ -572,7 +595,7 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
               className={`absolute right-1.5 rounded-xl h-9 w-9 p-0 flex items-center justify-center transition-all ${
                 input.trim()
                   ? "bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
-                  : "bg-neutral-800 text-neutral-500"
+                  : "bg-neutral-200 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-500"
               }`}
             >
               <ArrowRight />
