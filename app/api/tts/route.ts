@@ -1,9 +1,4 @@
-import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import { NextRequest, NextResponse } from "next/server";
-
-const elevenlabs = new ElevenLabsClient({
-  apiKey: process.env.ELEVENLABS_API_KEY,
-});
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,48 +11,39 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Text is required" }, { status: 400 });
     }
 
-    if (!process.env.ELEVENLABS_API_KEY) {
-      console.error("❌ ElevenLabs API key not configured");
-      return NextResponse.json(
-        { error: "ElevenLabs API key not configured" },
-        { status: 500 }
-      );
+    console.log("🎙️ Generating speech with Web Speech API...");
+
+    // Use Web Speech API compatible format
+    // We'll return a simple response that the client can use with browser's native TTS
+    // OR use a free service like Google Cloud TTS (free tier: 4M characters/month)
+
+    // For now, let's use a simple server-side solution with a free API
+    // Using Google Translate TTS (unofficial but free)
+    const encodedText = encodeURIComponent(text.substring(0, 200)); // Limit to 200 chars
+    const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q=${encodedText}`;
+
+    console.log("📥 Fetching audio from Google TTS...");
+
+    const response = await fetch(ttsUrl, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`TTS service error: ${response.status}`);
     }
 
-    console.log("🎙️ Calling ElevenLabs API...");
+    const audioBuffer = await response.arrayBuffer();
 
-    // Generate speech using ElevenLabs
-    // Using eleven_turbo_v2_5 which is available on free tier
-    const audioStream = await elevenlabs.textToSpeech.convert(
-      "21m00Tcm4TlvDq8ikWAM", // Rachel voice ID
-      {
-        text: text,
-        modelId: "eleven_turbo_v2_5", // Updated to use turbo v2.5 model (free tier compatible)
-        outputFormat: "mp3_44100_128",
-      }
-    );
-
-    console.log("📥 Audio stream received, converting to buffer...");
-
-    // Convert the ReadableStream to a buffer
-    const reader = audioStream.getReader();
-    const chunks: Uint8Array[] = [];
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      chunks.push(value);
-    }
-
-    const audioBuffer = Buffer.concat(chunks);
-
-    console.log("✅ Audio generated, size:", audioBuffer.length, "bytes");
+    console.log("✅ Audio generated, size:", audioBuffer.byteLength, "bytes");
 
     // Return audio as MP3
     return new NextResponse(audioBuffer, {
       headers: {
         "Content-Type": "audio/mpeg",
-        "Content-Length": audioBuffer.length.toString(),
+        "Content-Length": audioBuffer.byteLength.toString(),
       },
     });
   } catch (error) {

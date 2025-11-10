@@ -13,16 +13,15 @@ import { api } from "@/convex/_generated/api";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
+import { SpeakingProvider, useSpeaking } from "@/lib/context/speaking";
 
 interface ChatInterfaceProps {
   chatId: Id<"chats">;
   initialMessages: Doc<"messages">[];
 }
 
-export default function ChatInterface({
-  chatId,
-  initialMessages,
-}: ChatInterfaceProps) {
+function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
+  const { isSpeaking, startSpeaking, stopSpeaking, audioRef } = useSpeaking();
   const [messages, setMessages] = useState<Doc<"messages">[]>(initialMessages);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -32,9 +31,7 @@ export default function ChatInterface({
     input: unknown;
   } | null>(null);
   const [isToolExecuting, setIsToolExecuting] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const [autoSpeak, setAutoSpeak] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Speech recognition setup
@@ -98,7 +95,7 @@ export default function ChatInterface({
     return `---START---\n${terminalHtml}\n---END---`;
   };
 
-  // Text-to-speech function
+    // Text-to-speech function
   const speakText = async (text: string) => {
     if (!text || isSpeaking) return;
 
@@ -115,10 +112,9 @@ export default function ChatInterface({
 
     if (!cleanText || cleanText.length < 3) return;
 
-    try {
-      setIsSpeaking(true);
-      console.log("🎤 AI Speaking started - isSpeaking:", true);
+    console.log("🎤 Starting TTS for text:", cleanText.substring(0, 50) + "...");
 
+    try {
       const response = await fetch("/api/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -127,16 +123,23 @@ export default function ChatInterface({
 
       if (!response.ok) {
         console.error("TTS failed:", await response.text());
-        setIsSpeaking(false);
         return;
       }
 
       const audioBlob = await response.blob();
+      console.log("🎵 Audio blob received, size:", audioBlob.size, "bytes");
+      
+      if (audioBlob.size < 100) {
+        console.error("❌ Audio too small, likely empty");
+        return;
+      }
+
       const audioUrl = URL.createObjectURL(audioBlob);
 
-      // Stop any currently playing audio
+      // Stop any currently playing audio first
       if (audioRef.current) {
         audioRef.current.pause();
+        audioRef.current.currentTime = 0;
         audioRef.current.src = "";
       }
 
@@ -144,31 +147,49 @@ export default function ChatInterface({
       const audio = new Audio(audioUrl);
       audioRef.current = audio;
 
+      // Set up event handlers BEFORE starting to speak
+      audio.onloadedmetadata = () => {
+        console.log("🎵 Audio loaded, duration:", audio.duration, "seconds");
+      };
+
       audio.onended = () => {
-        setIsSpeaking(false);
-        console.log("🎤 AI Speaking ended - isSpeaking:", false);
+        console.log("✅ Audio playback ended naturally");
+        stopSpeaking();
         URL.revokeObjectURL(audioUrl);
       };
 
-      audio.onerror = () => {
-        console.error("Audio playback error");
-        setIsSpeaking(false);
+      audio.onerror = (e) => {
+        console.error("❌ Audio playback error:", e);
+        stopSpeaking();
         URL.revokeObjectURL(audioUrl);
       };
 
-      await audio.play();
+      // Start speaking state and play audio
+      startSpeaking();
+      console.log("🎤 Speaking state started, now playing audio...");
+      
+      // Wait a tiny bit for state to update before playing
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
+      await audio.play().catch(err => {
+        console.error("❌ Play error:", err);
+        stopSpeaking();
+        URL.revokeObjectURL(audioUrl);
+      });
+      
+      console.log("✅ Audio play() called successfully");
     } catch (error) {
-      console.error("Text-to-speech error:", error);
-      setIsSpeaking(false);
+      console.error("❌ Text-to-speech error:", error);
+      stopSpeaking();
     }
   };
 
-  const stopSpeaking = () => {
+  const handleStopSpeaking = () => {
     if (audioRef.current) {
       audioRef.current.pause();
-      audioRef.current.src = "";
-      setIsSpeaking(false);
+      audioRef.current.currentTime = 0;
     }
+    stopSpeaking();
   };
 
   /**
@@ -406,24 +427,47 @@ export default function ChatInterface({
         </div>
       </section>
 
-      {/* Input form */}
-      <footer className="border-t border-neutral-800 bg-neutral-900 p-4 relative">
-        {/* Animated gradient blob when AI is speaking */}
-        {isSpeaking && (
-          <>
-            <div className="absolute -top-24 left-0 right-0 h-48 pointer-events-none z-0">
-              <div className="absolute inset-0 ai-speaking-gradient"></div>
+      {/* Audio Visualizer - DJ Style (separate from input) */}
+      {isSpeaking && (
+        <div className="border-t border-neutral-800 bg-black py-8">
+          <div className="max-w-4xl mx-auto px-4">
+            {/* Audio visualizer bars - like DJ speakers with GLOW */}
+            <div className="flex items-end justify-center gap-3 h-32">
+              {[...Array(20)].map((_, i) => (
+                <div
+                  key={i}
+                  className="audio-visualizer-bar w-4 rounded-t-lg shadow-glow"
+                  style={{
+                    background: `linear-gradient(to top, 
+                      rgb(147, 51, 234), 
+                      rgb(236, 72, 153), 
+                      rgb(59, 130, 246))`,
+                    boxShadow: `
+                      0 0 20px rgba(147, 51, 234, 0.8),
+                      0 0 40px rgba(236, 72, 153, 0.6),
+                      0 0 60px rgba(59, 130, 246, 0.4)
+                    `,
+                    minHeight: '20px',
+                    animationDelay: `${i * 0.05}s`,
+                    animationDuration: `${0.5 + Math.random() * 0.4}s`,
+                  }}
+                />
+              ))}
             </div>
-            {/* Debug indicator */}
-            <div className="absolute top-1 right-4 z-50 bg-green-500 text-white text-xs px-2 py-1 rounded">
-              AI Speaking
+            <div className="text-center mt-4">
+              <span className="text-sm text-blue-400 font-semibold tracking-wide animate-pulse">
+                🎵 AI SPEAKING
+              </span>
             </div>
-          </>
-        )}
+          </div>
+        </div>
+      )}
 
+      {/* Input form */}
+      <footer className="border-t border-neutral-800 bg-neutral-900 p-4">
         <form
           onSubmit={handleSubmit}
-          className="max-w-4xl mx-auto relative z-10"
+          className="max-w-4xl mx-auto"
         >
           {/* Voice controls */}
           <div className="flex items-center justify-between mb-3">
@@ -448,7 +492,7 @@ export default function ChatInterface({
                   type="button"
                   size="sm"
                   variant="outline"
-                  onClick={stopSpeaking}
+                  onClick={handleStopSpeaking}
                   className="text-xs text-red-400 hover:text-red-300 hover:bg-red-950 border-red-800 animate-pulse"
                 >
                   <VolumeX className="w-3.5 h-3.5 mr-1.5" />
@@ -537,5 +581,13 @@ export default function ChatInterface({
         </form>
       </footer>
     </main>
+  );
+}
+
+export default function ChatInterface(props: ChatInterfaceProps) {
+  return (
+    <SpeakingProvider>
+      <ChatInterfaceInner {...props} />
+    </SpeakingProvider>
   );
 }

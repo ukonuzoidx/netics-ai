@@ -55,14 +55,14 @@ export default function DashboardSidebar() {
             </button> */}
             {open ? (
               <button
-              onClick={handleNewChat}
-              className={cn(
-                " w-full px-4 justify-center gap-2 flex items-center py-2.5 rounded-lg border border-neutral-700 hover:bg-neutral-900 transition-colors",
-              )}
-            >
-              <PlusIcon className="h-5 w-5 text-white shrink-0" />
-              {open && <span className="text-sm text-white">New Chat</span>}
-            </button>
+                onClick={handleNewChat}
+                className={cn(
+                  " w-full px-4 justify-center gap-2 flex items-center py-2.5 rounded-lg border border-neutral-700 hover:bg-neutral-900 transition-colors"
+                )}
+              >
+                <PlusIcon className="h-5 w-5 text-white shrink-0" />
+                {open && <span className="text-sm text-white">New Chat</span>}
+              </button>
             ) : (
               <button className="w-7 flex items-center justify-center py-2 rounded-full bg-neutral-700 hover:bg-neutral-900 transition-colors">
                 <PlusIcon className="h-3 w-3 text-white shrink-0" />
@@ -174,8 +174,7 @@ const LogoIcon = () => {
       href="/dashboard"
       className="relative z-20 flex items-center justify-center py-4"
     >
-        <Image src={neticsAIsm} alt="Netics AI" className="w-8 h-8" />
-      
+      <Image src={neticsAIsm} alt="Netics AI" className="w-8 h-8" />
     </a>
   );
 };

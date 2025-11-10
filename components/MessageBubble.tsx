@@ -7,7 +7,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { Button } from "./ui/button";
-import { useState } from "react";
+import { useSpeaking } from "@/lib/context/speaking";
 
 interface MessageBubbleProps {
   content: string;
@@ -30,8 +30,8 @@ const formatMessage = (content: string): string => {
 
 export function MessageBubble({ content, isUser }: MessageBubbleProps) {
   const { user } = useUser();
+  const { isSpeaking, startSpeaking, stopSpeaking, audioRef } = useSpeaking();
   const formattedContent = formatMessage(content);
-  const [isSpeaking, setIsSpeaking] = useState(false);
 
   const handleSpeak = async () => {
     if (isSpeaking || isUser) return;
@@ -49,7 +49,7 @@ export function MessageBubble({ content, isUser }: MessageBubbleProps) {
     if (!cleanText || cleanText.length < 3) return;
 
     try {
-      setIsSpeaking(true);
+      startSpeaking();
 
       const response = await fetch("/api/tts", {
         method: "POST",
@@ -59,28 +59,29 @@ export function MessageBubble({ content, isUser }: MessageBubbleProps) {
 
       if (!response.ok) {
         console.error("TTS failed");
-        setIsSpeaking(false);
+        stopSpeaking();
         return;
       }
 
       const audioBlob = await response.blob();
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
+      audioRef.current = audio;
 
       audio.onended = () => {
-        setIsSpeaking(false);
+        stopSpeaking();
         URL.revokeObjectURL(audioUrl);
       };
 
       audio.onerror = () => {
-        setIsSpeaking(false);
+        stopSpeaking();
         URL.revokeObjectURL(audioUrl);
       };
 
       await audio.play();
     } catch (error) {
       console.error("TTS error:", error);
-      setIsSpeaking(false);
+      stopSpeaking();
     }
   };
 

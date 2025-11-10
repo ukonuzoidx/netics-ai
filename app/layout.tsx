@@ -25,9 +25,14 @@ export default function RootLayout({
 }>) {
   return (
     <ConvexClientProvider>
-      <html lang="en" className="dark">
+      <html lang="en" className="dark" style={{ colorScheme: 'dark' }}>
+        <head>
+          <meta name="color-scheme" content="dark" />
+          <meta name="theme-color" content="#0a0a0a" />
+        </head>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-950 text-neutral-50`}
+          style={{ backgroundColor: '#0a0a0a', color: '#fafafa' }}
         >
           {children}
         </body>
