@@ -25,14 +25,28 @@ export default function RootLayout({
 }>) {
   return (
     <ConvexClientProvider>
-      <html lang="en" className="dark" style={{ colorScheme: 'dark' }}>
+      <html lang="en" className="dark" style={{ colorScheme: 'dark' }} suppressHydrationWarning>
         <head>
-          <meta name="color-scheme" content="dark" />
+          <meta name="color-scheme" content="dark only" />
           <meta name="theme-color" content="#0a0a0a" />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() {
+                  try {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.style.colorScheme = 'dark';
+                    localStorage.setItem('theme', 'dark');
+                  } catch (e) {}
+                })();
+              `,
+            }}
+          />
         </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-950 text-neutral-50`}
           style={{ backgroundColor: '#0a0a0a', color: '#fafafa' }}
+          suppressHydrationWarning
         >
           {children}
         </body>
