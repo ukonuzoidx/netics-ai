@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import neticsAIIm from "../public/netics_ai.png";
 import neticsAIM from "../public/netics_ai_main_logo.png";
-import neticsAIsm from "../public/NeticsAISmall.png";
+// import neticsAIsm from "../public/NeticsAISmall.png";
 import groupTaskSvg from "../public/group_task.svg";
 import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
 import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
@@ -19,7 +19,7 @@ import {
   MobileNavToggle,
   MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { TextGradientEffect } from "@/components/ui/text-gradient-effect";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useMutation } from "convex/react";
