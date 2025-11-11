@@ -1,7 +1,8 @@
 export default function WelcomeMessage() {
   return (
     <div className="flex flex-col items-center justify-center h-full mt-10">
-      <div className="bg-neutral-200 dark:bg-neutral-900 rounded-2xl shadow-sm ring-1 ring-inset ring-neutral-800 px-6 py-5 max-w-2xl w-full">
+      
+      <div className="bg-neutral-200/10 dark:bg-neutral-900 rounded-2xl shadow-sm ring-1 ring-inset ring-neutral-800 px-6 py-5 max-w-2xl w-full">
         <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
           👋 Welcome to Netics AI
         </h2>

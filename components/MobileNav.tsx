@@ -49,21 +49,21 @@ export default function MobileNav() {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 z-40 md:hidden animate-in fade-in duration-200"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden animate-in fade-in duration-200"
         onClick={closeMobileNav}
       />
 
       {/* Sidebar */}
-      <div className="fixed left-0 top-0 h-full w-[280px] bg-white dark:bg-black border-r border-neutral-200 dark:border-neutral-800 z-50 md:hidden overflow-y-auto animate-in slide-in-from-left duration-300">
+  <div className="fixed left-0 h-full w-[280px] bg-white/20 dark:bg-white/10 backdrop-blur-xl border-r border-white/25 z-50 md:hidden overflow-y-auto animate-in slide-in-from-left duration-300 shadow-[0_20px_50px_rgba(15,23,42,0.28)]">
         {/* Close button */}
         <button
           onClick={closeMobileNav}
-          className="absolute right-4 top-4 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+          className="absolute right-4 top-16 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
         >
           <X className="h-5 w-5" />
         </button>
 
-        <div className="flex flex-col h-full p-4 pt-12">
+        <div className="flex flex-col h-full p-4 pt-16">
           {/* Logo */}
           <div className="mb-6">
             <Image
@@ -76,7 +76,7 @@ export default function MobileNav() {
           {/* New Chat Button */}
           <button
             onClick={handleNewChat}
-            className="w-full px-4 py-2.5 rounded-lg border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors flex items-center justify-center gap-2 mb-4"
+            className="w-full px-4 py-2.5 rounded-full bg-white/20 dark:bg-white/10 backdrop-blur-xl border border-white/25 hover:bg-white/30 dark:hover:bg-white/15 transition-all shadow-[0_16px_40px_rgba(59,130,246,0.2)] flex items-center justify-center gap-2 mb-4"
           >
             <PlusIcon className="h-5 w-5 text-neutral-900 dark:text-white" />
             <span className="text-sm text-neutral-900 dark:text-white">
@@ -86,20 +86,20 @@ export default function MobileNav() {
 
           {/* Search */}
           <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500 dark:text-neutral-400 z-10" />
             <input
               type="text"
               placeholder="Search chats..."
-              className="w-full pl-9 pr-3 py-2 text-sm bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg text-neutral-900 dark:text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-700"
+              className="w-full pl-9 pr-3 py-2 text-sm bg-white/20 dark:bg-white/10 backdrop-blur-xl border border-white/25 rounded-full text-neutral-900 dark:text-white placeholder-neutral-500 dark:placeholder-neutral-300 focus:outline-none focus:ring-2 focus:ring-blue-500/60 transition-all shadow-[0_16px_40px_rgba(59,130,246,0.2)]"
             />
           </div>
 
           {/* Chat List */}
           <div className="flex-1 overflow-y-auto space-y-1">
-            <div className="text-xs font-medium text-neutral-500 dark:text-neutral-500 mb-2 px-2">
+            <div className="text-xs font-medium text-neutral-600 dark:text-neutral-500 mb-2 px-2">
               Recent Chats
             </div>
-            {chats?.slice(0, 10).map((chat) => (
+            {chats?.slice(0, 6).map((chat) => (
               <ChatItem
                 key={chat._id}
                 chat={chat}
@@ -112,13 +112,13 @@ export default function MobileNav() {
           </div>
 
           {/* Bottom Navigation */}
-          <div className="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-800 space-y-2">
+          <div className="mt-4 pt-4 border-t border-white/20 space-y-2">
             <button
               onClick={() => {
                 closeMobileNav();
                 router.push("/dashboard/voice");
               }}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-900 text-neutral-700 dark:text-neutral-300 transition-colors"
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-full bg-white/20 dark:bg-white/10 backdrop-blur-xl border border-white/25 hover:bg-white/30 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200 transition-all shadow-[0_20px_44px_rgba(15,23,42,0.24)]"
             >
               <Phone className="h-4 w-4" />
               <span className="text-sm">Voice Chat</span>
@@ -128,7 +128,7 @@ export default function MobileNav() {
                 closeMobileNav();
                 router.push("/dashboard/settings");
               }}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-900 text-neutral-700 dark:text-neutral-300 transition-colors"
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-full bg-white/20 dark:bg-white/10 backdrop-blur-xl border border-white/25 hover:bg-white/30 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200 transition-all shadow-[0_20px_44px_rgba(15,23,42,0.24)]"
             >
               <Settings className="h-4 w-4" />
               <span className="text-sm">Settings</span>
@@ -155,7 +155,7 @@ function ChatItem({
   return (
     <button
       onClick={() => onNavigate(chat._id)}
-      className="w-full text-left px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-900 text-sm text-neutral-700 dark:text-neutral-300 transition-colors"
+  className="w-full text-left px-3 py-2 rounded-lg bg-white/50 dark:bg-white/10 backdrop-blur-xl border border-white/25 hover:bg-white/30 dark:hover:bg-white/15 text-sm text-neutral-700 dark:text-neutral-200 transition-all shadow-[0_18px_42px_rgba(15,23,42,0.22)]"
     >
       <p className="truncate">
         {lastMessage

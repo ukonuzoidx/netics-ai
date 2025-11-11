@@ -88,10 +88,10 @@ export function MessageBubble({ content, isUser }: MessageBubbleProps) {
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} group`}>
       <div
-        className={`rounded-2xl px-4 py-2.5 max-w-[85%] md:max-w-[75%] shadow-sm ring-1 ring-inset relative ${
+        className={`rounded-2xl px-4 py-2.5 max-w-[85%] md:max-w-[75%] shadow-lg ring-1 ring-inset relative backdrop-blur-xl ${
           isUser
-            ? "bg-blue-600 text-white rounded-br-none ring-blue-700"
-            : "bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 rounded-bl-none ring-neutral-300 dark:ring-neutral-700"
+            ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-br-none ring-purple-400/50"
+            : "bg-white/70 dark:bg-white/10 text-neutral-900 dark:text-neutral-100 rounded-bl-none ring-white/40 dark:ring-white/30"
         }`}
       >
         {/* Speaker button for AI messages */}
@@ -102,7 +102,7 @@ export function MessageBubble({ content, isUser }: MessageBubbleProps) {
             variant="ghost"
             onClick={handleSpeak}
             disabled={isSpeaking}
-            className="absolute -top-8 right-0 opacity-0 group-hover:opacity-100 transition-opacity h-7 px-2 text-xs bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300"
+            className="absolute -top-8 right-0 opacity-0 group-hover:opacity-100 transition-opacity h-7 px-2 text-xs bg-white/60 dark:bg-white/10 backdrop-blur-xl border border-white/30 hover:bg-white/80 dark:hover:bg-white/20 text-neutral-700 dark:text-neutral-300 shadow-lg"
           >
             <Volume2 className="w-3 h-3 mr-1" />
             {isSpeaking ? "Speaking..." : "Speak"}
@@ -198,32 +198,32 @@ export function MessageBubble({ content, isUser }: MessageBubbleProps) {
             </ReactMarkdown>
           )}
         </div>
+      </div>
+      <div
+        className={`absolute bottom-0 ${
+          isUser
+            ? "right-3 translate-x-1/2 translate-y-1/2"
+            : "left-3 -translate-x-1/2 translate-y-1/2"
+        }`}
+      >
         <div
-          className={`absolute bottom-0 ${
+          className={`w-8 h-8 rounded-full border-2 ${
             isUser
-              ? "right-3 translate-x-1/2 translate-y-1/2"
-              : "left-3 -translate-x-1/2 translate-y-1/2"
-          }`}
+              ? "bg-neutral-300 dark:bg-neutral-800 border-neutral-400 dark:border-neutral-700"
+              : "bg-blue-600 border-neutral-300 dark:border-neutral-800"
+          } flex items-center justify-center shadow-sm`}
         >
-          <div
-            className={`w-8 h-8 rounded-full border-2 ${
-              isUser
-                ? "bg-neutral-300 dark:bg-neutral-800 border-neutral-400 dark:border-neutral-700"
-                : "bg-blue-600 border-neutral-300 dark:border-neutral-800"
-            } flex items-center justify-center shadow-sm`}
-          >
-            {isUser ? (
-              <Avatar className="h-7 w-7">
-                <AvatarImage src={user?.imageUrl} />
-                <AvatarFallback>
-                  {user?.firstName?.charAt(0)}
-                  {user?.lastName?.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-            ) : (
-              <BotIcon className="h-5 w-5 text-white" />
-            )}
-          </div>
+          {isUser ? (
+            <Avatar className="h-7 w-7">
+              <AvatarImage src={user?.imageUrl} />
+              <AvatarFallback>
+                {user?.firstName?.charAt(0)}
+                {user?.lastName?.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
+          ) : (
+            <BotIcon className="h-5 w-5 text-white" />
+          )}
         </div>
       </div>
     </div>

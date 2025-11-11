@@ -584,7 +584,9 @@ export default function VoiceChat() {
 
         {!isCallActive && (
           <div className="bg-neutral-100 dark:bg-neutral-900 rounded-2xl border border-neutral-300 dark:border-neutral-800 p-6 space-y-3">
-            <h3 className="font-medium text-neutral-900 dark:text-neutral-100">How it works:</h3>
+            <h3 className="font-medium text-neutral-900 dark:text-neutral-100">
+              How it works:
+            </h3>
             <ul className="space-y-2 text-sm text-neutral-700 dark:text-neutral-400">
               <li className="flex items-start gap-2">
                 <span className="text-green-500 mt-0.5">●</span>

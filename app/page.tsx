@@ -40,7 +40,9 @@ export default function LandingPage() {
     { name: "About", link: "#about" },
   ];
 
-  const handleInputSubmit = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleInputSubmit = async (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
     if (e.key !== "Enter" || !inputValue.trim() || isLoading) return;
 
     setIsLoading(true);
@@ -52,9 +54,11 @@ export default function LandingPage() {
         // Store flag to know user came from landing page input
         localStorage.setItem("fromLandingPageInput", "true");
         // Trigger sign in - the user will be redirected back after
-        const signInButton = document.querySelector('[data-clerk-sign-in]') as HTMLButtonElement;
+        const signInButton = document.querySelector(
+          "[data-clerk-sign-in]"
+        ) as HTMLButtonElement;
         signInButton?.click();
-        
+
         // Reset loading after a short delay (user might cancel)
         setTimeout(() => {
           setIsLoading(false);
@@ -64,11 +68,11 @@ export default function LandingPage() {
 
       // User is signed in, create chat with their message
       const chatId = await createChat({ title: inputValue.slice(0, 50) });
-      
+
       // Store the message to send once in chat
       localStorage.setItem("pendingChatMessage", inputValue);
       localStorage.setItem("fromLandingPageInput", "true");
-      
+
       // Navigate to the new chat
       router.push(`/dashboard/chat/${chatId}`);
     } catch (error) {
@@ -81,7 +85,7 @@ export default function LandingPage() {
     <main className="w-full min-h-screen relative overflow-hidden">
       {/* Gradient Background - Layer 2 (middle) */}
       <div className="text-gray-200 dark:text-gray-800">
-        <BackgroundRippleEffect rows={10} cols={20} cellSize={280} />
+        <BackgroundRippleEffect rows={10} cols={20} cellSize={80} />
       </div>
 
       <div className="fixed inset-0 z-0">
@@ -89,6 +93,9 @@ export default function LandingPage() {
           <></>
         </BackgroundBeamsWithCollision>
       </div>
+
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-100 via-blue-200 to-indigo-200 dark:from-violet-600/60 dark:via-purple-600/40 dark:to-fuchsia-600/40 opacity-50" />
+      {/* <div className="absolute inset-0 bg-gradient-to-br from-slate-100 via-blue-200 to-indigo-200 dark:from-slate-300/20 dark:via-blue-300/20 dark:to-indigo-400/20 opacity-50" /> */}
 
       {/* <div className="fixed inset-0 z-10 pointer-events-none overflow-hidden">
         <Image
@@ -111,6 +118,7 @@ export default function LandingPage() {
               src={neticsAIM}
               alt="Netics AI"
               className="w-full h-16 dark:[filter:brightness(0)_invert(1)]"
+              // className="w-full h-16 "
             />
           </a>
 
@@ -133,7 +141,9 @@ export default function LandingPage() {
                 fallbackRedirectUrl={"/dashboard"}
                 forceRedirectUrl={"/dashboard"}
               >
-                <NavbarButton variant="primary" data-clerk-sign-in>Sign Up</NavbarButton>
+                <NavbarButton variant="primary" data-clerk-sign-in>
+                  Sign Up
+                </NavbarButton>
               </SignInButton>
             </SignedOut>
           </div>
@@ -205,8 +215,8 @@ export default function LandingPage() {
 
       {/* Main content */}
       <section className="relative z-30 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 mt-20 sm:mt-32 md:mt-40 pb-8 sm:pb-12 md:pb-16">
-        <div className="h-[12rem] sm:h-[16rem] md:h-[15rem] flex items-center justify-center w-full max-w-4xl">
-          <TextGradientEffect text="NETICS AI" duration={1} />
+        <div className="h-[12rem] sm:h-[16rem] md:h-[15rem] flex items-center justify-center w-full max-w-5xl">
+          <TextGradientEffect text="NETICS AI" />
         </div>
         {/* Hero text */}
         <div className="text-center space-y-4 sm:space-y-6 mb-8 sm:mb-12 md:mb-16">
@@ -224,7 +234,7 @@ export default function LandingPage() {
         </div>
 
         {/* Search input */}
-        <div className="w-full max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-3xl mb-16 sm:mb-24 md:mb-32 px-4 sm:px-0">
+        <div className="w-full max-w-mmd pt-16 sm:max-w-md md:max-w-2xl lg:max-w-3xl mb-16 sm:mb-24 md:mb-32 px-4 sm:px-0">
           {/* SEARCH BAR ABOVE */}
           <div className="relative group -mt-10 z-10">
             {/* group task */}

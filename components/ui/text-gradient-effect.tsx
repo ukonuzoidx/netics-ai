@@ -1,29 +1,15 @@
 "use client";
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef } from "react";
 import { motion } from "motion/react";
 
 export const TextGradientEffect = ({
   text,
-  duration,
+  // duration,
 }: {
   text: string;
-  duration?: number;
+  // duration?: number;
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
-  const [cursor, setCursor] = useState({ x: 0, y: 0 });
-  const [maskPosition, setMaskPosition] = useState({ cx: "50%", cy: "50%" });
-
-  useEffect(() => {
-    if (svgRef.current && cursor.x !== null && cursor.y !== null) {
-      const svgRect = svgRef.current.getBoundingClientRect();
-      const cxPercentage = ((cursor.x - svgRect.left) / svgRect.width) * 100;
-      const cyPercentage = ((cursor.y - svgRect.top) / svgRect.height) * 100;
-      setMaskPosition({
-        cx: `${cxPercentage}%`,
-        cy: `${cyPercentage}%`,
-      });
-    }
-  }, [cursor]);
 
   return (
     <svg
@@ -32,7 +18,6 @@ export const TextGradientEffect = ({
       height="100%"
       viewBox="0 0 300 100"
       xmlns="http://www.w3.org/2000/svg"
-      onMouseMove={(e) => setCursor({ x: e.clientX, y: e.clientY })}
       className="select-none"
     >
       <defs>
@@ -53,12 +38,19 @@ export const TextGradientEffect = ({
         <motion.radialGradient
           id="revealMaskAlwaysOn"
           gradientUnits="userSpaceOnUse"
-          r="20%"
-          initial={{ cx: "50%", cy: "50%" }}
-          animate={maskPosition}
-          transition={{ duration: duration ?? 0, ease: "easeOut" }}
+          r="60%"
+          animate={{
+            cx: ["20%", "80%", "50%", "20%"],
+            cy: ["30%", "70%", "50%", "30%"],
+          }}
+          transition={{
+            duration: 8,
+            ease: "linear",
+            repeat: Infinity,
+          }}
         >
           <stop offset="0%" stopColor="white" />
+          <stop offset="50%" stopColor="white" />
           <stop offset="100%" stopColor="black" />
         </motion.radialGradient>
         <mask id="textMaskAlwaysOn">
@@ -71,7 +63,7 @@ export const TextGradientEffect = ({
           />
         </mask>
       </defs>
-      
+
       {/* Background text with stroke - always visible */}
       <text
         x="50%"
@@ -84,7 +76,7 @@ export const TextGradientEffect = ({
       >
         {text}
       </text>
-      
+
       {/* Animated stroke text */}
       <motion.text
         x="50%"
@@ -105,7 +97,7 @@ export const TextGradientEffect = ({
       >
         {text}
       </motion.text>
-      
+
       {/* Gradient text with mask - always visible */}
       <text
         x="50%"
@@ -113,7 +105,7 @@ export const TextGradientEffect = ({
         textAnchor="middle"
         dominantBaseline="middle"
         stroke="url(#textGradientAlwaysOn)"
-        strokeWidth="0.3"
+        strokeWidth="0.4"
         mask="url(#textMaskAlwaysOn)"
         className="fill-transparent font-[helvetica] text-7xl font-bold"
       >

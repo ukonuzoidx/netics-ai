@@ -34,7 +34,7 @@ export default function DashboardSidebar() {
 
   return (
     <Sidebar open={open} setOpen={setOpen}>
-      <SidebarBody className="justify-between gap-0 bg-white dark:bg-black border-r border-neutral-200 dark:border-neutral-800">
+      <SidebarBody className="justify-between gap-0 bg-white/50 dark:bg-black/40 backdrop-blur-2xl border-r border-white/30 dark:border-white/10 shadow-xl">
         <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
           {/* Logo */}
           {open ? <Logo /> : <LogoIcon />}
@@ -57,18 +57,18 @@ export default function DashboardSidebar() {
               <button
                 onClick={handleNewChat}
                 className={cn(
-                  " w-full px-4 justify-center gap-2 flex items-center py-2.5 rounded-lg border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
+                  "w-full px-4 justify-center gap-2 flex items-center py-2.5 rounded-2xl bg-white/60 dark:bg-white/10 backdrop-blur-xl border border-white/30 hover:bg-white/80 dark:hover:bg-white/20 transition-all shadow-lg"
                 )}
               >
                 <PlusIcon className="h-5 w-5 text-neutral-900 dark:text-white shrink-0" />
                 {open && (
-                  <span className="text-sm text-neutral-900 dark:text-white">
+                  <span className="text-sm text-neutral-900 dark:text-white font-medium">
                     New Chat
                   </span>
                 )}
               </button>
             ) : (
-              <button className="w-7 flex items-center justify-center py-2 rounded-full bg-neutral-300 dark:bg-neutral-700 hover:bg-neutral-400 dark:hover:bg-neutral-900 transition-colors">
+              <button className="w-7 flex items-center justify-center py-2 rounded-full bg-white/60 dark:bg-white/10 backdrop-blur-xl hover:bg-white/80 dark:hover:bg-white/20 transition-all shadow-lg">
                 <PlusIcon className="h-3 w-3 text-neutral-900 dark:text-white shrink-0" />
               </button>
             )}
@@ -78,15 +78,15 @@ export default function DashboardSidebar() {
           <div className="mt-4 px-3">
             {open ? (
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500 dark:text-neutral-500" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500 dark:text-neutral-400 z-10" />
                 <input
                   type="text"
                   placeholder="Search"
-                  className="w-full pl-10 pr-3 py-2 rounded-lg bg-neutral-100 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 text-sm text-neutral-900 dark:text-white placeholder:text-neutral-500 dark:placeholder:text-neutral-500 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-700"
+                  className="w-full pl-10 pr-3 py-2 rounded-2xl bg-white/60 dark:bg-white/10 backdrop-blur-xl border border-white/30 text-sm text-neutral-900 dark:text-white placeholder:text-neutral-500 dark:placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-white/50 transition-all shadow-lg"
                 />
               </div>
             ) : (
-              <button className="w-full flex items-center justify-center py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors">
+              <button className="w-full flex items-center justify-center py-2 rounded-2xl bg-white/60 dark:bg-white/10 backdrop-blur-xl hover:bg-white/80 dark:hover:bg-white/20 transition-all shadow-lg">
                 <Search className="h-5 w-5 text-neutral-900 dark:text-white shrink-0" />
               </button>
             )}
@@ -97,8 +97,10 @@ export default function DashboardSidebar() {
             <button
               onClick={() => router.push("/dashboard/voice")}
               className={cn(
-                "w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors",
-                !open && "justify-center px-0"
+                "w-full flex items-center gap-3 px-3 py-2 rounded-2xl dark:hover:bg-white/20 transition-all shadow-lg",
+                !open
+                  ? "justify-center px-0"
+                  : "bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20"
               )}
             >
               <Phone className="h-5 w-5 text-neutral-900 dark:text-white shrink-0" />
@@ -152,13 +154,13 @@ export default function DashboardSidebar() {
           <button
             onClick={() => router.push("/dashboard/settings")}
             className={cn(
-              "w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors",
+              "w-full flex items-center gap-3 px-3 py-2 rounded-2xl bg-white/60 dark:bg-white/10 backdrop-blur-xl border border-white/30 hover:bg-white/80 dark:hover:bg-white/20 transition-all shadow-lg",
               !open && "justify-center px-0"
             )}
           >
             <Settings className="h-5 w-5 text-neutral-900 dark:text-white shrink-0" />
             {open && (
-              <span className="text-sm text-neutral-900 dark:text-white">
+              <span className="text-sm text-neutral-900 dark:text-white font-medium">
                 Settings
               </span>
             )}

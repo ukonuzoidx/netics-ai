@@ -54,17 +54,22 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
   // Check for pending message from landing page
   useEffect(() => {
     if (hasSentPendingMessage.current) return;
-    
+
     const pendingMessage = localStorage.getItem("pendingChatMessage");
     const fromLandingPage = localStorage.getItem("fromLandingPageInput");
-    
-    if (pendingMessage && fromLandingPage === "true" && messages.length === 0 && !isLoading) {
+
+    if (
+      pendingMessage &&
+      fromLandingPage === "true" &&
+      messages.length === 0 &&
+      !isLoading
+    ) {
       // Only auto-send if this is a new chat with no messages AND user came from landing page
       setInput(pendingMessage);
       localStorage.removeItem("pendingChatMessage");
       localStorage.removeItem("fromLandingPageInput");
       hasSentPendingMessage.current = true;
-      
+
       // Auto-submit the message after a brief delay
       setTimeout(() => {
         formRef.current?.requestSubmit();
@@ -393,7 +398,11 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-neutral-50 dark:bg-neutral-950">
+    <div className="flex flex-col h-full w-full">
+      {/* Colorful gradient glow behind glass */}
+
+      {/* <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-neutral-500/50 to-white/50 rounded-2xl blur-xl opacity-30"></div> */}
+
       {/* Messages container */}
       <div className="flex-1 overflow-y-auto p-2 md:p-4">
         <div className="max-w-4xl mx-auto space-y-3 py-4">
@@ -490,8 +499,12 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
       )}
 
       {/* Input form */}
-      <footer className="border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
-        <form ref={formRef} onSubmit={handleSubmit} className="max-w-4xl mx-auto">
+      <footer className="border-t border-white/30 dark:border-white/20 bg-white/50 dark:bg-black/40 backdrop-blur-2xl p-4 shadow-xl">
+        <form
+          ref={formRef}
+          onSubmit={handleSubmit}
+          className="max-w-4xl mx-auto"
+        >
           {/* Voice controls */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -562,10 +575,10 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
                 type="button"
                 onClick={toggleListening}
                 disabled={isLoading}
-                className={`rounded-xl h-11 w-11 p-0 flex items-center justify-center transition-all ${
+                className={`rounded-2xl h-11 w-11 p-0 flex items-center justify-center transition-all backdrop-blur-xl shadow-lg ${
                   listening
                     ? "bg-red-500 hover:bg-red-600 text-white animate-pulse"
-                    : "bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-400"
+                    : "bg-white/60 dark:bg-white/10 hover:bg-white/80 dark:hover:bg-white/20 border border-white/30 text-neutral-700 dark:text-neutral-200"
                 }`}
                 title={listening ? "Stop listening" : "Start voice input"}
               >
@@ -582,19 +595,19 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={listening ? "Listening..." : "Message AI Agent..."}
-              className={`flex-1 py-3 px-4 rounded-2xl border focus:outline-none focus:ring-2 focus:border-transparent pr-12 placeholder:text-neutral-500 dark:placeholder:text-neutral-500 ${
+              className={`flex-1 py-3 px-4 rounded-2xl backdrop-blur-xl border focus:outline-none focus:ring-2 focus:border-transparent pr-12 placeholder:text-neutral-500 dark:placeholder:text-neutral-400 transition-all shadow-lg ${
                 listening
-                  ? "border-red-700 focus:ring-red-500 bg-red-950/50 animate-pulse text-neutral-100"
-                  : "border-neutral-300 dark:border-neutral-700 focus:ring-blue-500 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100"
+                  ? "border-red-500/50 focus:ring-red-500/50 bg-red-500/20 animate-pulse text-white"
+                  : "border-white/30 focus:ring-purple-400/50 focus:border-white/50 bg-white/60 dark:bg-white/10 text-neutral-900 dark:text-neutral-100"
               }`}
               disabled={isLoading}
             />
             <Button
               type="submit"
               disabled={isLoading || !input.trim()}
-              className={`absolute right-1.5 rounded-xl h-9 w-9 p-0 flex items-center justify-center transition-all ${
+              className={`absolute right-1.5 rounded-2xl h-9 w-9 p-0 flex items-center justify-center transition-all shadow-lg ${
                 input.trim()
-                  ? "bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                  ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
                   : "bg-neutral-200 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-500"
               }`}
             >

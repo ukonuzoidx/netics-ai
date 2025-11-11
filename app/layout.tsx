@@ -25,16 +25,16 @@ export default function RootLayout({
 }>) {
   return (
     <ConvexClientProvider>
-      <html lang="en" className="dark" suppressHydrationWarning>
+      <html lang="en" suppressHydrationWarning>
         <head>
-          <meta name="color-scheme" content="dark light" />
-          <meta name="theme-color" content="#0a0a0a" />
+          <meta name="color-scheme" content="light dark" />
+          <meta name="theme-color" content="#ffffff" />
           <script
             dangerouslySetInnerHTML={{
               __html: `
                 (function() {
                   try {
-                    const theme = localStorage.getItem('theme') || 'dark';
+                    const theme = localStorage.getItem('theme') || 'light';
                     document.documentElement.classList.toggle('dark', theme === 'dark');
                     document.documentElement.style.colorScheme = theme;
                   } catch (e) {}

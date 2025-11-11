@@ -19,7 +19,9 @@ export default function DashboardPage() {
       if (pendingMessage && fromLandingPage === "true") {
         console.log("📝 Found pending message, creating chat:", pendingMessage);
         try {
-          const chatId = await createChat({ title: pendingMessage.slice(0, 50) });
+          const chatId = await createChat({
+            title: pendingMessage.slice(0, 50),
+          });
           console.log("✅ Chat created, navigating to:", chatId);
           // Keep message and flag in localStorage for ChatInterface to send it
           router.push(`/dashboard/chat/${chatId}`);
@@ -35,16 +37,18 @@ export default function DashboardPage() {
   }, [createChat, router]);
 
   return (
-    <div className="flex-1 flex items-center justify-center p-4 h-full bg-neutral-100 dark:bg-neutral-950">
-      <div className="relative max-w-2xl w-full">
-        {/* Decorative elements */}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-neutral-900 to-neutral-800/50 rounded-3xl"></div>
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,#262626_1px,transparent_1px),linear-gradient(to_bottom,#262626_1px,transparent_1px)] bg-[size:4rem_4rem] rounded-3xl"></div>
+    <div className="relative flex-1 flex items-center justify-center p-4 h-full overflow-hidden">
+      {/* Colorful gradient background - stronger for light mode */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-100 via-blue-200 to-indigo-200 dark:from-violet-600/60 dark:via-purple-600/40 dark:to-fuchsia-600/40 opacity-50" />
+
+      <div className="relative max-w-2xl w-full group">
+        {/* Decorative blur - stronger colors for light mode */}
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-purple-400/50 via-pink-400/50 to-orange-400/50 dark:from-purple-500/40 dark:via-pink-500/40 dark:to-orange-500/40 rounded-3xl blur-2xl opacity-70 group-hover:opacity-90 transition-opacity"></div>
 
         <div className="relative space-y-6 p-8 text-center">
-          <div className="bg-neutral-100 dark:bg-neutral-900/60 backdrop-blur-sm shadow-sm ring-1 ring-neutral-800/50 rounded-2xl p-6 space-y-4">
-            <div className="bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-xl p-4 inline-flex">
-              <BotIcon className="w-12 h-12 text-neutral-300" />
+          <div className="bg-white/30 dark:bg-white/10 backdrop-blur-md shadow-2xl ring-1 ring-white/30 dark:ring-white/20 rounded-3xl p-8 space-y-4">
+            <div className="bg-gradient-to-br from-purple-400/40 via-pink-400/40 to-orange-400/40 dark:from-purple-500/30 dark:via-pink-500/30 dark:to-orange-500/30 backdrop-blur-md rounded-2xl p-5 inline-flex ring-1 ring-white/30 dark:ring-white/20 shadow-2xl">
+              <BotIcon className="w-12 h-12 text-purple-600 dark:text-neutral-300" />
             </div>
             <h2 className="text-2xl font-semibold bg-gradient-to-br from-neutral-500 to-neutral-500 dark:bg-gradient-to-br dark:from-neutral-100 dark:to-neutral-400 bg-clip-text text-transparent">
               {/* <h2 className="text-2xl font-semibold bg-gradient-to-br from-neutral-100 to-neutral-400 bg-clip-text text-transparent"> */}
