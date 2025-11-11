@@ -201,8 +201,8 @@ export function MessageBubble({ content, isUser }: MessageBubbleProps) {
         <div
           className={`absolute bottom-0 ${
             isUser
-              ? "right-0 translate-x-1/2 translate-y-1/2"
-              : "left-0 -translate-x-1/2 translate-y-1/2"
+              ? "right-3 translate-x-1/2 translate-y-1/2"
+              : "left-3 -translate-x-1/2 translate-y-1/2"
           }`}
         >
           <div

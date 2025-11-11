@@ -35,7 +35,7 @@ export default function DashboardPage() {
   }, [createChat, router]);
 
   return (
-    <div className="flex-1 flex items-center justify-center p-4 min-h-screen bg-neutral-100 dark:bg-neutral-950">
+    <div className="flex-1 flex items-center justify-center p-4 h-full bg-neutral-100 dark:bg-neutral-950">
       <div className="relative max-w-2xl w-full">
         {/* Decorative elements */}
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-neutral-900 to-neutral-800/50 rounded-3xl"></div>

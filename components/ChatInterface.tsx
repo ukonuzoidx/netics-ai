@@ -393,10 +393,10 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
   };
 
   return (
-    <main className="flex flex-col h-[calc(100vh-theme(spacing.14))]">
+    <div className="flex flex-col h-full w-full bg-neutral-50 dark:bg-neutral-950">
       {/* Messages container */}
-      <section className="flex-1 overflow-y-auto bg-neutral-50 dark:bg-neutral-950 p-2 md:p-0">
-        <div className="max-w-4xl mx-auto p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-2 md:p-4">
+        <div className="max-w-4xl mx-auto space-y-3 py-4">
           {messages?.length === 0 && <WelcomeMessage />}
 
           {messages?.map((message: Doc<"messages">) => (
@@ -451,7 +451,7 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
           )}
           <div ref={messagesEndRef} />
         </div>
-      </section>
+      </div>
 
       {/* Audio Visualizer - DJ Style (separate from input) */}
       {isSpeaking && (
@@ -603,7 +603,7 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
           </div>
         </form>
       </footer>
-    </main>
+    </div>
   );
 }
 
