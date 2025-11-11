@@ -16,7 +16,7 @@ export default function MobileNav() {
   const { isMobileNavOpen, closeMobileNav } = useNavigation();
   const chats = useQuery(api.chats.listChats);
   const createChat = useMutation(api.chats.createChat);
-  const deleteChat = useMutation(api.chats.deleteChat);
+  // const deleteChat = useMutation(api.chats.deleteChat);
 
   // Prevent body scroll when menu is open
   useEffect(() => {
