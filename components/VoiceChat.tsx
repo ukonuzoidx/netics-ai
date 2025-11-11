@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Mic, MicOff, Volume2, Phone, PhoneOff } from "lucide-react";
+import { Mic, MicOff, Phone, PhoneOff } from "lucide-react";
+import VoiceOrb from "./VoiceOrb";
+import "./VoiceOrb.css";
 
 export default function VoiceChat() {
   const [isCallActive, setIsCallActive] = useState(false);
@@ -143,17 +145,20 @@ export default function VoiceChat() {
       }
       const volume = Math.sqrt(sum / bufferLength);
 
-      // Threshold for detecting speech (adjust if needed)
-      const isSpeaking = volume > 0.01;
+      // INCREASED threshold to prevent false triggers from background noise
+      // 0.02 is more realistic for actual speech vs ambient noise
+      const isSpeaking = volume > 0.02;
 
       if (isSpeaking) {
         // User is speaking - reset the silence timer
+        console.log("🎤 Speech detected, volume:", volume.toFixed(4));
         isSpeakingRef.current = true;
         if (silenceTimerRef.current) {
           clearTimeout(silenceTimerRef.current);
         }
       } else if (isSpeakingRef.current) {
         // User stopped speaking - start silence timer
+        console.log("🤫 Silence detected, waiting...");
         if (silenceTimerRef.current) {
           clearTimeout(silenceTimerRef.current);
         }
@@ -164,7 +169,7 @@ export default function VoiceChat() {
             mediaRecorderRef.current.state === "recording"
           ) {
             console.log(
-              "⏱️ Silence detected after speaking, stopping recording..."
+              "⏱️ Silence timeout reached, stopping recording..."
             );
             mediaRecorderRef.current.stop();
           }
@@ -205,13 +210,24 @@ export default function VoiceChat() {
       });
       console.log("🎵 Audio blob created, size:", audioBlob.size, "bytes");
 
+      // REJECT if audio is too small - likely just background noise
+      // WebM header is ~200-300 bytes, so anything under 5KB is probably noise
+      if (audioBlob.size < 5000) {
+        console.log("⚠️ Audio too small (background noise), skipping transcription");
+        audioChunksRef.current = []; // Clear chunks
+        if (isCallActiveRef.current) {
+          await startRecordingProcess();
+        }
+        return;
+      }
+
       const message = await transcribeAudio(audioBlob);
       console.log("📝 Transcription:", message);
 
-      if (message && message.trim()) {
+      // ALSO check if transcription is meaningful (not just noise/silence)
+      if (message && message.trim() && message.trim().length > 2) {
         setCurrentTranscript(message);
 
-        // No keyword check - always respond to any speech
         console.log("🎯 Processing user message...");
 
         const userMessage = { role: "user" as const, text: message };
@@ -220,6 +236,7 @@ export default function VoiceChat() {
 
         console.log("🤖 Getting AI response...");
         const responseText = await getAIResponse(message);
+        console.log("📄 AI response text:", responseText.substring(0, 100) + "...");
 
         const aiMessage = { role: "assistant" as const, text: responseText };
         setConversation((prev) => [...prev, aiMessage]);
@@ -228,8 +245,16 @@ export default function VoiceChat() {
           content: responseText,
         });
 
-        await convertResponseToAudio(responseText);
-        console.log("🎵 Audio playback completed");
+        console.log("🎤 Converting AI response to audio...");
+        try {
+          await convertResponseToAudio(responseText);
+          console.log("✅ Audio playback completed successfully");
+        } catch (ttsError) {
+          console.error("❌ TTS/Audio playback failed:", ttsError);
+          // Continue even if TTS fails - don't block the flow
+        }
+      } else {
+        console.log("⚠️ Transcription empty or too short, ignoring");
       }
     } catch (error) {
       console.error("❌ Error handling silence:", error);
@@ -401,12 +426,58 @@ export default function VoiceChat() {
         body: JSON.stringify({ text: cleanText }),
       });
 
+      console.log("📡 TTS API response status:", response.status);
+
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error("❌ TTS API failed:", response.status, errorText);
         setIsAiSpeaking(false);
-        return;
+        throw new Error(`TTS failed: ${response.status} - ${errorText}`);
+      }
+
+      // Check if response is JSON (browser TTS fallback signal)
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        
+        if (data.useBrowserTTS) {
+          console.log("🎙️ Using browser's Web Speech API as fallback...");
+          
+          // Use browser's native speech synthesis
+          const utterance = new SpeechSynthesisUtterance(cleanText);
+          utterance.rate = 1.0;
+          utterance.pitch = 1.0;
+          utterance.volume = 1.0;
+          
+          await new Promise<void>((resolve, reject) => {
+            utterance.onend = () => {
+              console.log("✅ Browser TTS playback finished");
+              setIsAiSpeaking(false);
+              resolve();
+            };
+            
+            utterance.onerror = (error) => {
+              console.error("❌ Browser TTS error:", error);
+              setIsAiSpeaking(false);
+              reject(error);
+            };
+            
+            window.speechSynthesis.speak(utterance);
+          });
+          
+          return;
+        }
       }
 
       const audioBlob = await response.blob();
+      console.log("🎵 Audio blob received, size:", audioBlob.size, "bytes");
+      
+      if (audioBlob.size < 100) {
+        console.error("❌ Audio blob too small, likely error");
+        setIsAiSpeaking(false);
+        throw new Error("Audio blob too small");
+      }
+
       const audioUrl = URL.createObjectURL(audioBlob);
 
       if (audioRef.current) {
@@ -427,18 +498,26 @@ export default function VoiceChat() {
 
         audio.onerror = (error) => {
           console.error("❌ Audio playback error", error);
+          console.error("Audio element error details:", audio.error);
           setIsAiSpeaking(false);
           URL.revokeObjectURL(audioUrl);
-          reject(error);
+          reject(new Error(`Audio playback failed: ${audio.error?.message || 'Unknown error'}`));
         };
 
-        console.log("🔊 Playing audio...");
-        audio.play().catch(reject);
+        console.log("🔊 Starting audio playback...");
+        audio.play().catch((playError) => {
+          console.error("❌ audio.play() failed:", playError);
+          reject(playError);
+        });
       });
 
       console.log("🎵 Audio playback complete");
     } catch (error) {
       console.error("❌ TTS error:", error);
+      if (error instanceof Error) {
+        console.error("Error message:", error.message);
+        console.error("Error stack:", error.stack);
+      }
       setIsAiSpeaking(false);
       throw error;
     }
@@ -462,34 +541,15 @@ export default function VoiceChat() {
   return (
     <div className="flex flex-col h-full items-center justify-center p-8 bg-neutral-50 dark:bg-neutral-950">
       <div className="max-w-2xl w-full space-y-8">
-        <div className="text-center space-y-4">
-          <div
-            className={`inline-flex items-center justify-center w-32 h-32 rounded-full transition-all duration-300 ${
-              isCallActive
-                ? isAiSpeaking
-                  ? "bg-blue-950 ring-8 ring-blue-500/20 animate-pulse"
-                  : isMicPaused
-                  ? "bg-yellow-950 ring-8 ring-yellow-500/20"
-                  : isRecording
-                  ? "bg-red-950 ring-8 ring-red-500/20 animate-pulse"
-                  : "bg-green-950 ring-8 ring-green-500/20"
-                : "bg-neutral-200 dark:bg-neutral-900"
-            }`}
-          >
-            {isCallActive ? (
-              isAiSpeaking ? (
-                <Volume2 className="w-16 h-16 text-blue-400" />
-              ) : isMicPaused ? (
-                <MicOff className="w-16 h-16 text-yellow-400" />
-              ) : isRecording ? (
-                <Mic className="w-16 h-16 text-red-400" />
-              ) : (
-                <MicOff className="w-16 h-16 text-neutral-500 dark:text-neutral-500" />
-              )
-            ) : (
-              <Phone className="w-16 h-16 text-neutral-600 dark:text-neutral-500" />
-            )}
+        {/* Voice Orb - Only shown when call is active */}
+        {isCallActive && (
+          <div className="flex justify-center">
+            <VoiceOrb isListening={isRecording && !isMicPaused && !isAiSpeaking} />
           </div>
+        )}
+
+        <div className="text-center space-y-4">
+         
 
           <div className="space-y-2">
             <h1 className="text-3xl font-bold bg-gradient-to-br from-neutral-900 to-neutral-600 dark:from-neutral-100 dark:to-neutral-400 bg-clip-text text-transparent">

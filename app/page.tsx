@@ -84,7 +84,7 @@ export default function LandingPage() {
   return (
     <main className="w-full min-h-screen relative overflow-hidden">
       {/* Gradient Background - Layer 2 (middle) */}
-      <div className="text-gray-200 dark:text-gray-800">
+      <div className="text-gray-200 dark:text-gray-900">
         <BackgroundRippleEffect rows={10} cols={20} cellSize={80} />
       </div>
 
@@ -94,7 +94,7 @@ export default function LandingPage() {
         </BackgroundBeamsWithCollision>
       </div>
 
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-100 via-blue-200 to-indigo-200 dark:from-violet-600/60 dark:via-purple-600/40 dark:to-fuchsia-600/40 opacity-50" />
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-100 via-blue-200 to-indigo-200 opacity-50 dark:opacity-0" />
       {/* <div className="absolute inset-0 bg-gradient-to-br from-slate-100 via-blue-200 to-indigo-200 dark:from-slate-300/20 dark:via-blue-300/20 dark:to-indigo-400/20 opacity-50" /> */}
 
       {/* <div className="fixed inset-0 z-10 pointer-events-none overflow-hidden">
@@ -162,7 +162,10 @@ export default function LandingPage() {
             </a>
             <MobileNavToggle
               isOpen={isMobileMenuOpen}
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              onClick={() => {
+                console.log("Toggle clicked! Current state:", isMobileMenuOpen);
+                setIsMobileMenuOpen(!isMobileMenuOpen);
+              }}
             />
           </MobileNavHeader>
 

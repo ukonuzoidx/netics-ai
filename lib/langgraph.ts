@@ -546,7 +546,7 @@ const arxivTool = new DynamicTool({
   },
 });
 
-// Google Calendar tool
+// Google Calendar tool - Uses Clerk's Google OAuth token (no separate sign-in!)
 const calendarTool = new DynamicTool({
   name: "schedule_meeting",
   description: `Schedule a meeting on Google Calendar. Input must be a JSON string with:
@@ -559,7 +559,7 @@ const calendarTool = new DynamicTool({
   
   CRITICAL: Always use the current year (2025) when scheduling events. Check the CURRENT DATE in the system message before creating dates.
   
-  Note: User must connect their Google Calendar in Settings first. If not connected, explain they need to go to Settings and connect Google Calendar.`,
+  Note: User must be signed in with Google to use this feature. If the user hasn't signed in with Google, explain they need to sign out and sign in with Google.`,
   func: async (input: string, runManager) => {
     try {
       const params = JSON.parse(input);
@@ -574,39 +574,41 @@ const calendarTool = new DynamicTool({
 
       console.log("👤 User ID:", userId);
 
-      // Import Convex client dynamically to avoid circular dependencies
-      const { getConvexClient } = await import("@/lib/convex");
-      const { api } = await import("@/convex/_generated/api");
-      const convex = getConvexClient();
-
-      // Get user's Google Calendar tokens
-      const tokens = await convex.query(api.integrations.getGoogleTokens, {
-        userId: userId,
-      });
-
-      console.log("🔑 Tokens retrieved:", tokens ? "Yes" : "No");
-
-      if (!tokens) {
-        return `I need access to your Google Calendar to schedule meetings. Please:
-
-1. Go to Settings (click the gear icon in the sidebar)
-2. Click "Connect" on the Google Calendar card
-3. Authorize Netics AI to access your calendar
-
-Once connected, I'll be able to schedule this meeting for you!`;
-      }
-
-      // Initialize Google Calendar API
-      const oauth2Client = new google.auth.OAuth2(
-        process.env.GOOGLE_CLIENT_ID,
-        process.env.GOOGLE_CLIENT_SECRET,
-        process.env.GOOGLE_REDIRECT_URI
+      // Get Google access token from Clerk (no separate OAuth needed!)
+      const tokenResponse = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+        }/api/calendar/token`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "x-user-id": userId, // Pass user ID in header
+          },
+        }
       );
 
+      const tokenData = await tokenResponse.json();
+
+      if (!tokenData.hasAccess || !tokenData.accessToken) {
+        return `I need Google Calendar access to schedule meetings. ${
+          tokenData.message ||
+          "Please sign out and sign in with Google to grant Calendar permissions."
+        }
+
+To enable Calendar access:
+1. Click your profile picture
+2. Sign out
+3. Sign in with Google
+4. Grant Calendar permissions when prompted
+
+Then try scheduling your meeting again!`;
+      }
+
+      // Initialize Google Calendar API with Clerk's token
+      const oauth2Client = new google.auth.OAuth2();
       oauth2Client.setCredentials({
-        access_token: tokens.accessToken,
-        refresh_token: tokens.refreshToken,
-        expiry_date: tokens.expiryDate,
+        access_token: tokenData.accessToken,
       });
 
       const calendar = google.calendar({ version: "v3", auth: oauth2Client });
@@ -624,11 +626,19 @@ Once connected, I'll be able to schedule this meeting for you!`;
           timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         },
         attendees: params.attendees?.map((email: string) => ({ email })) || [],
+        reminders: {
+          useDefault: false,
+          overrides: [
+            { method: "email", minutes: 24 * 60 },
+            { method: "popup", minutes: 10 },
+          ],
+        },
       };
 
       const response = await calendar.events.insert({
         calendarId: "primary",
         requestBody: event,
+        sendUpdates: "all",
       });
 
       console.log("✅ Calendar event created:", {
@@ -661,18 +671,17 @@ ${
       });
 
       if (error.message?.includes("invalid_grant") || error.code === 401) {
-        return `Your Google Calendar connection has expired. Please:
+        return `Your Google Calendar access has expired. Please:
+1. Sign out
+2. Sign in with Google again
+3. Grant Calendar permissions
 
-1. Go to Settings
-2. Disconnect Google Calendar
-3. Connect it again
-
-Then I'll be able to schedule meetings for you!`;
+Then try scheduling your meeting again!`;
       }
 
       return `Error scheduling meeting: ${
         error.message || "Unknown error"
-      }. Please try again or check your calendar connection in Settings.`;
+      }. Please try again or contact support.`;
     }
   },
 });

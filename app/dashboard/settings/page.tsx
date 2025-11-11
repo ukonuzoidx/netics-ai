@@ -1,33 +1,37 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useQuery, useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import { useAuth } from "@clerk/nextjs";
-import { CheckCircle2, Calendar, X } from "lucide-react";
-import { useState } from "react";
+import { CheckCircle2, Calendar, AlertCircle } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export default function SettingsPage() {
   const { userId } = useAuth();
-  const integrations = useQuery(api.integrations.list, {
-    userId: userId || "",
-  });
-  const removeIntegration = useMutation(api.integrations.remove);
-  const [removing, setRemoving] = useState<string | null>(null);
+  const [hasGoogleAuth, setHasGoogleAuth] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
-  const handleDisconnect = async (service: string) => {
-    if (!userId) return;
-    setRemoving(service);
-    try {
-      await removeIntegration({ userId, service });
-    } catch (error) {
-      console.error("Error disconnecting:", error);
-    } finally {
-      setRemoving(null);
-    }
-  };
+  // Check if user is signed in with Google through Clerk
+  useEffect(() => {
+    const checkGoogleAuth = async () => {
+      if (!userId) {
+        setCheckingAuth(false);
+        return;
+      }
 
-  const hasGoogleCalendar = integrations?.some((i) => i.service === "google");
+      try {
+        const response = await fetch("/api/calendar/token");
+        const data = await response.json();
+        setHasGoogleAuth(data.hasAccess);
+      } catch (error) {
+        console.error("Error checking Google auth:", error);
+        setHasGoogleAuth(false);
+      } finally {
+        setCheckingAuth(false);
+      }
+    };
+
+    checkGoogleAuth();
+  }, [userId]);
 
   return (
     <div className="max-w-4xl mx-auto p-8">
@@ -57,31 +61,43 @@ export default function SettingsPage() {
                 <p className="text-sm text-neutral-400">
                   Schedule meetings, check availability, manage events
                 </p>
-                {hasGoogleCalendar && (
+                {checkingAuth ? (
+                  <p className="text-xs text-neutral-500 mt-1">
+                    Checking connection...
+                  </p>
+                ) : hasGoogleAuth ? (
                   <p className="text-xs text-green-400 mt-1 flex items-center gap-1">
                     <CheckCircle2 className="w-3 h-3" />
-                    Connected
+                    Connected via Google Sign-In
+                  </p>
+                ) : (
+                  <p className="text-xs text-amber-400 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    Sign in with Google to enable Calendar
                   </p>
                 )}
               </div>
             </div>
-            {hasGoogleCalendar ? (
+            {hasGoogleAuth ? (
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => handleDisconnect("google")}
-                disabled={removing === "google"}
-                className="text-red-400 hover:text-red-300 hover:bg-red-950 border-neutral-700"
+                disabled
+                className="text-green-400 border-green-900 bg-green-950/30"
               >
-                <X className="w-4 h-4 mr-1" />
-                {removing === "google" ? "Disconnecting..." : "Disconnect"}
+                <CheckCircle2 className="w-4 h-4 mr-1" />
+                Active
               </Button>
             ) : (
               <Button
-                onClick={() => (window.location.href = "/api/auth/google")}
+                onClick={() => {
+                  alert(
+                    "To enable Google Calendar:\n\n1. Sign out\n2. Sign in with Google\n3. Grant Calendar permissions when prompted\n\nThen your Calendar will be automatically connected!"
+                  );
+                }}
                 className="bg-blue-600 hover:bg-blue-700"
               >
-                Connect
+                How to Enable
               </Button>
             )}
           </div>
