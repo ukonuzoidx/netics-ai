@@ -36,12 +36,12 @@ export default function MobileNav() {
     router.push(`/dashboard/chat/${chatId}`);
   };
 
-  const handleDeleteChat = async (id: Id<"chats">) => {
-    await deleteChat({ id });
-    if (window.location.pathname.includes(id)) {
-      router.push("/dashboard");
-    }
-  };
+  // const handleDeleteChat = async (id: Id<"chats">) => {
+  //   await deleteChat({ id });
+  //   if (window.location.pathname.includes(id)) {
+  //     router.push("/dashboard");
+  //   }
+  // };
 
   if (!isMobileNavOpen) return null;
 
