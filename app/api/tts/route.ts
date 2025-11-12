@@ -36,7 +36,11 @@ export async function POST(request: NextRequest) {
 
         if (openaiResponse.ok) {
           const audioBuffer = await openaiResponse.arrayBuffer();
-          console.log("✅ OpenAI TTS audio generated, size:", audioBuffer.byteLength, "bytes");
+          console.log(
+            "✅ OpenAI TTS audio generated, size:",
+            audioBuffer.byteLength,
+            "bytes"
+          );
 
           return new NextResponse(audioBuffer, {
             headers: {
@@ -54,12 +58,16 @@ export async function POST(request: NextRequest) {
 
     // Fallback: Try multiple Google TTS endpoints
     console.log("📥 Trying Google TTS endpoints...");
-    
+
     const endpoints = [
       // Method 1: Standard endpoint
-      `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q=${encodeURIComponent(truncatedText)}`,
+      `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q=${encodeURIComponent(
+        truncatedText
+      )}`,
       // Method 2: Alternative endpoint
-      `https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=gtx&q=${encodeURIComponent(truncatedText)}`,
+      `https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=gtx&q=${encodeURIComponent(
+        truncatedText
+      )}`,
     ];
 
     for (let i = 0; i < endpoints.length; i++) {
@@ -67,16 +75,21 @@ export async function POST(request: NextRequest) {
         console.log(`� Trying endpoint ${i + 1}/${endpoints.length}...`);
         const response = await fetch(endpoints[i], {
           headers: {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Referer": "https://translate.google.com/",
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            Referer: "https://translate.google.com/",
           },
         });
 
         if (response.ok) {
           const audioBuffer = await response.arrayBuffer();
-          
+
           if (audioBuffer.byteLength > 100) {
-            console.log("✅ Google TTS audio generated, size:", audioBuffer.byteLength, "bytes");
+            console.log(
+              "✅ Google TTS audio generated, size:",
+              audioBuffer.byteLength,
+              "bytes"
+            );
             return new NextResponse(audioBuffer, {
               headers: {
                 "Content-Type": "audio/mpeg",

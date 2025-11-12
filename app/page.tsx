@@ -84,11 +84,11 @@ export default function LandingPage() {
   return (
     <main className="w-full min-h-screen relative overflow-hidden">
       {/* Gradient Background - Layer 2 (middle) */}
-      <div className="text-gray-200 dark:text-gray-900">
-        <BackgroundRippleEffect rows={10} cols={20} cellSize={80} />
-      </div>
 
-      <div className="fixed inset-0 z-0">
+      <div className="fixed inset-0 -z-50">
+        <div className="text-gray-200 dark:text-gray-900">
+          <BackgroundRippleEffect rows={10} cols={20} cellSize={80} />
+        </div>
         <BackgroundBeamsWithCollision className="min-h-screen">
           <></>
         </BackgroundBeamsWithCollision>
@@ -106,8 +106,10 @@ export default function LandingPage() {
       </div> */}
 
       {/* Resizable Navbar */}
-      <Navbar className="fixed top-0">
+      <Navbar className="fixed top-10">
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-300/40 via-pink-200/30 to-orange-500/40 dark:from-purple-300/40 dark:via-pink-200/30 dark:to-orange-500/40 rounded-full blur-3xl opacity-50 mx-auto max-w-5xl transition-opacity" />
         {/* Desktop Navigation */}
+
         <NavBody>
           {/* Logo */}
           <a

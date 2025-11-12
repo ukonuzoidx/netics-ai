@@ -293,6 +293,7 @@
 //     </Tag>
 //   );
 // };
+
 "use client";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -360,8 +361,11 @@ export const Navbar = ({ children, className }: NavbarProps) => {
   return (
     <motion.div
       ref={ref}
-      // IMPORTANT: Change this to class of `fixed` if you want the navbar to be fixed
-      className={cn("sticky inset-x-0 top-20 z-40 w-full", className)}
+      className={cn(
+        "sticky top-0 w-full pointer-events-auto",
+        className
+      )}
+      // style={{ isolation: "isolate" }}
     >
       {React.Children.map(children, (child) =>
         React.isValidElement(child)
@@ -377,27 +381,40 @@ export const Navbar = ({ children, className }: NavbarProps) => {
 
 export const NavBody = ({ children, className }: NavBodyProps) => {
   return (
+    // <motion.div
+    //   initial={{
+    //     backdropFilter: "blur(20px) saturate(180%)",
+    //     y: 20,
+    //   }}
+    //   animate={{
+    //     backdropFilter: "blur(20px) saturate(180%)",
+    //     y: 20,
+    //   }}
+    //   transition={{
+    //     type: "spring",
+    //     stiffness: 200,
+    //     damping: 50,
+    //   }}
+    //   className={cn(
+    //     "relative z-[60] mx-auto hidden w-full max-w-[1000px] flex-row items-center justify-between self-start rounded-full px-4 py-2 lg:flex",
+    //     "bg-white/70 dark:bg-black/40",
+    //     "backdrop-blur-2xl backdrop-saturate-150",
+    //     "border border-white/20 dark:border-white/10",
+    //     "shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]",
+    //     "before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-br before:from-white/40 before:to-white/10 before:opacity-50 before:pointer-events-none dark:before:from-white/10 dark:before:to-white/5",
+    //     className
+    //   )}
+    // >
+    //   {children}
+    // </motion.div>
+
     <motion.div
-      initial={{
-        backdropFilter: "blur(20px) saturate(180%)",
-        y: 20,
-      }}
-      animate={{
-        backdropFilter: "blur(20px) saturate(180%)",
-        y: 20,
-      }}
-      transition={{
-        type: "spring",
-        stiffness: 200,
-        damping: 50,
-      }}
       className={cn(
-        "relative z-[60] mx-auto hidden w-full max-w-[1000px] flex-row items-center justify-between self-start rounded-full px-4 py-2 lg:flex",
-        "bg-white/70 dark:bg-black/40",
-        "backdrop-blur-2xl backdrop-saturate-150",
-        "border border-white/20 dark:border-white/10",
-        "shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]",
-        "before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-br before:from-white/40 before:to-white/10 before:opacity-50 before:pointer-events-none dark:before:from-white/10 dark:before:to-white/5",
+        "relative mx-auto hidden w-full max-w-[1000px] flex-row items-center justify-between self-start rounded-full px-4 py-2 lg:flex",
+        // "bg-white/5 dark:bg-white/5",
+        "bg-black/5 backdrop-blur-xl backdrop-saturate-200 border border-white/20 shadow-2xl",
+        "before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-br before:from-white/40 before:to-white/10 before:opacity-40 dark:before:from-white/10 dark:before:to-white/5",
+
         className
       )}
     >
@@ -447,7 +464,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
               {/* Glass effect layer */}
               <motion.div
                 layoutId="hovered"
-                className="absolute inset-0 h-full w-full rounded-full bg-white/60 dark:bg-white/10 backdrop-blur-xl backdrop-saturate-200 border border-white/30 dark:border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.2)]"
+                className="absolute inset-0 h-full w-full rounded-full bg-[#D8E4E9]/40 dark:bg-[#D8E4E9]/10 backdrop-blur-xl backdrop-saturate-200 border border-white/30 dark:border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.2)]"
               />
 
               {/* Liquid blob effect */}
@@ -501,10 +518,11 @@ export const MobileNav = ({ children, className }: MobileNavProps) => {
       }}
       className={cn(
         "relative z-50 mx-auto flex w-full max-w-[95vw] flex-col items-center justify-between px-3 py-2 lg:hidden",
-        "bg-white/70 dark:bg-black/40",
-        "backdrop-blur-2xl backdrop-saturate-150",
+        "bg-white/10 dark:bg-white/5",
+        "backdrop-blur-md backdrop-saturate-200 border border-white/20",
         "border border-white/20 dark:border-white/10",
-        "shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]",
+        // "shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]",
+        "shadow-2xl",
         "before:absolute before:inset-0 before:rounded-[2rem] before:bg-gradient-to-br before:from-white/40 before:to-white/10 before:opacity-50 before:pointer-events-none dark:before:from-white/10 dark:before:to-white/5",
         className
       )}

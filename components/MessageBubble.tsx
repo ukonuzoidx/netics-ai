@@ -86,14 +86,28 @@ export function MessageBubble({ content, isUser }: MessageBubbleProps) {
   };
 
   return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"} group`}>
-      <div
-        className={`rounded-2xl px-4 py-2.5 max-w-[85%] md:max-w-[75%] shadow-lg ring-1 ring-inset relative backdrop-blur-xl ${
+    <div
+      className={`flex ${
+        isUser ? "justify-end" : "justify-start"
+      } group relative mb-6`}
+    >
+      {/* <div
+        className={`rounded-2xl px-4 py-2.5 max-w-[85%] md:max-w-[75%] shadow-lg ring-1 ring-inset backdrop-blur-xl ${
           isUser
-            ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-br-none ring-purple-400/50"
-            : "bg-white/70 dark:bg-white/10 text-neutral-900 dark:text-neutral-100 rounded-bl-none ring-white/40 dark:ring-white/30"
+            ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-br-none ring-purple-400/50 mr-4 backdrop-blur-sm"
+            : "bg-white/70 dark:bg-white/10 text-neutral-900 dark:text-neutral-100 rounded-bl-none ring-white/40 dark:ring-white/30 ml-4"
         }`}
-      >
+      > */}
+        <div
+  className={`rounded-2xl px-4 py-2.5 max-w-[85%] md:max-w-[75%] 
+    backdrop-blur-lg shadow-xl border 
+    transition-all duration-300
+    ${
+      isUser
+        ? "bg-gradient-to-r from-purple-600/90 to-pink-600/90 text-white rounded-br-none border-purple-400/30 mr-4"
+        : "bg-white/15 dark:bg-neutral-900/100 text-neutral-900 dark:text-neutral-100 rounded-bl-none border-white/20 dark:border-white/10 ml-4"
+    }`}
+>
         {/* Speaker button for AI messages */}
         {!isUser && (
           <Button

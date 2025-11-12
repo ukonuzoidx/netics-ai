@@ -168,9 +168,7 @@ export default function VoiceChat() {
             mediaRecorderRef.current &&
             mediaRecorderRef.current.state === "recording"
           ) {
-            console.log(
-              "⏱️ Silence timeout reached, stopping recording..."
-            );
+            console.log("⏱️ Silence timeout reached, stopping recording...");
             mediaRecorderRef.current.stop();
           }
         }, 2000); // 2 seconds of silence after speaking
@@ -213,7 +211,9 @@ export default function VoiceChat() {
       // REJECT if audio is too small - likely just background noise
       // WebM header is ~200-300 bytes, so anything under 5KB is probably noise
       if (audioBlob.size < 5000) {
-        console.log("⚠️ Audio too small (background noise), skipping transcription");
+        console.log(
+          "⚠️ Audio too small (background noise), skipping transcription"
+        );
         audioChunksRef.current = []; // Clear chunks
         if (isCallActiveRef.current) {
           await startRecordingProcess();
@@ -236,7 +236,10 @@ export default function VoiceChat() {
 
         console.log("🤖 Getting AI response...");
         const responseText = await getAIResponse(message);
-        console.log("📄 AI response text:", responseText.substring(0, 100) + "...");
+        console.log(
+          "📄 AI response text:",
+          responseText.substring(0, 100) + "..."
+        );
 
         const aiMessage = { role: "assistant" as const, text: responseText };
         setConversation((prev) => [...prev, aiMessage]);
@@ -439,39 +442,39 @@ export default function VoiceChat() {
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
         const data = await response.json();
-        
+
         if (data.useBrowserTTS) {
           console.log("🎙️ Using browser's Web Speech API as fallback...");
-          
+
           // Use browser's native speech synthesis
           const utterance = new SpeechSynthesisUtterance(cleanText);
           utterance.rate = 1.0;
           utterance.pitch = 1.0;
           utterance.volume = 1.0;
-          
+
           await new Promise<void>((resolve, reject) => {
             utterance.onend = () => {
               console.log("✅ Browser TTS playback finished");
               setIsAiSpeaking(false);
               resolve();
             };
-            
+
             utterance.onerror = (error) => {
               console.error("❌ Browser TTS error:", error);
               setIsAiSpeaking(false);
               reject(error);
             };
-            
+
             window.speechSynthesis.speak(utterance);
           });
-          
+
           return;
         }
       }
 
       const audioBlob = await response.blob();
       console.log("🎵 Audio blob received, size:", audioBlob.size, "bytes");
-      
+
       if (audioBlob.size < 100) {
         console.error("❌ Audio blob too small, likely error");
         setIsAiSpeaking(false);
@@ -501,7 +504,13 @@ export default function VoiceChat() {
           console.error("Audio element error details:", audio.error);
           setIsAiSpeaking(false);
           URL.revokeObjectURL(audioUrl);
-          reject(new Error(`Audio playback failed: ${audio.error?.message || 'Unknown error'}`));
+          reject(
+            new Error(
+              `Audio playback failed: ${
+                audio.error?.message || "Unknown error"
+              }`
+            )
+          );
         };
 
         console.log("🔊 Starting audio playback...");
@@ -544,13 +553,13 @@ export default function VoiceChat() {
         {/* Voice Orb - Only shown when call is active */}
         {isCallActive && (
           <div className="flex justify-center">
-            <VoiceOrb isListening={isRecording && !isMicPaused && !isAiSpeaking} />
+            <VoiceOrb
+              isListening={isRecording && !isMicPaused && !isAiSpeaking}
+            />
           </div>
         )}
 
         <div className="text-center space-y-4">
-         
-
           <div className="space-y-2">
             <h1 className="text-3xl font-bold bg-gradient-to-br from-neutral-900 to-neutral-600 dark:from-neutral-100 dark:to-neutral-400 bg-clip-text text-transparent">
               {isCallActive ? "Voice Chat Active" : "Voice Chat"}
