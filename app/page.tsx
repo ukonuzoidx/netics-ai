@@ -106,8 +106,8 @@ export default function LandingPage() {
       </div> */}
 
       {/* Resizable Navbar */}
-      <Navbar className="fixed top-10">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-300/40 via-pink-200/30 to-orange-500/40 dark:from-purple-300/40 dark:via-pink-200/30 dark:to-orange-500/40 rounded-full blur-3xl opacity-50 mx-auto max-w-5xl transition-opacity" />
+      <Navbar className="fixed top-0">
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-300/40 via-pink-200/30 to-orange-500/40 dark:from-purple-300/40 dark:via-pink-200/30 dark:to-orange-500/40 rounded-full blur-3xl opacity-90 mx-auto max-w-5xl transition-opacity" />
         {/* Desktop Navigation */}
 
         <NavBody>
@@ -162,19 +162,29 @@ export default function LandingPage() {
                 className="w-full h-10 dark:[filter:brightness(0)_invert(1)]"
               />
             </a>
-            <MobileNavToggle
-              isOpen={isMobileMenuOpen}
-              onClick={() => {
-                console.log("Toggle clicked! Current state:", isMobileMenuOpen);
-                setIsMobileMenuOpen(!isMobileMenuOpen);
-              }}
-            />
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+
+              <MobileNavToggle
+                isOpen={isMobileMenuOpen}
+                onClick={() => {
+                  console.log(
+                    "Toggle clicked! Current state:",
+                    isMobileMenuOpen
+                  );
+                  setIsMobileMenuOpen(!isMobileMenuOpen);
+                }}
+              />
+            </div>
           </MobileNavHeader>
+      
 
           <MobileNavMenu
             isOpen={isMobileMenuOpen}
             onClose={() => setIsMobileMenuOpen(false)}
           >
+        {/* <div className="absolute inset-0 bg-white dark:bg-black" /> */}
+
             {navItems.map((item, idx) => (
               <a
                 key={`mobile-link-${idx}`}
