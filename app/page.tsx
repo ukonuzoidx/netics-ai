@@ -25,6 +25,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
+import { TextHoverEffect } from "@/components/ui/text-hover-effect";
 
 export default function LandingPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -107,7 +108,7 @@ export default function LandingPage() {
 
       {/* Resizable Navbar */}
       <Navbar className="fixed top-0">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-300/40 via-pink-200/30 to-orange-500/40 dark:from-purple-300/40 dark:via-pink-200/30 dark:to-orange-500/40 rounded-full blur-3xl opacity-90 mx-auto max-w-5xl transition-opacity" />
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-300/40 via-pink-200/30 to-orange-500/40 dark:from-purple-300/40 dark:via-pink-200/30 dark:to-orange-500/40 rounded-full blur-3xl opacity-60 mx-auto max-w-5xl transition-opacity" />
         {/* Desktop Navigation */}
 
         <NavBody>
@@ -159,7 +160,7 @@ export default function LandingPage() {
               <Image
                 src={neticsAIM}
                 alt="Netics AI"
-                className="w-full h-10 dark:[filter:brightness(0)_invert(1)]"
+                className="w-32 h-13 dark:[filter:brightness(0)_invert(1)]"
               />
             </a>
             <div className="flex items-center gap-2">
@@ -230,8 +231,9 @@ export default function LandingPage() {
 
       {/* Main content */}
       <section className="relative z-30 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 mt-20 sm:mt-32 md:mt-40 pb-8 sm:pb-12 md:pb-16">
-        <div className="h-[12rem] sm:h-[16rem] md:h-[15rem] flex items-center justify-center w-full max-w-5xl">
+        <div className="h-[12rem] sm:h-[13rem] md:h-[15rem] flex items-center justify-center w-full max-w-5xl sm:mt-10 lg:mt-12 opacity-65">
           <TextGradientEffect text="NETICS AI" />
+          {/* <TextHoverEffect text="NETICS AI" /> */}
         </div>
         {/* Hero text */}
         <div className="text-center space-y-4 sm:space-y-6 mb-8 sm:mb-12 md:mb-16">

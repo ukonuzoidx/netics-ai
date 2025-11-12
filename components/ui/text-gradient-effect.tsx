@@ -4,8 +4,8 @@ import { motion } from "motion/react";
 
 export const TextGradientEffect = ({
   text,
-  // duration,
-}: {
+}: // duration,
+{
   text: string;
   // duration?: number;
 }) => {
@@ -107,7 +107,7 @@ export const TextGradientEffect = ({
         stroke="url(#textGradientAlwaysOn)"
         strokeWidth="0.4"
         mask="url(#textMaskAlwaysOn)"
-        className="fill-transparent font-[helvetica] text-7xl font-bold"
+        className="fill-transparent font-[helvetica] text-7xl  font-bold"
       >
         {text}
       </text>
