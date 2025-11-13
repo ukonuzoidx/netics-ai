@@ -24,9 +24,9 @@ interface LoadingProviderProps {
   initialLoadDuration?: number; // Duration in milliseconds
 }
 
-export function LoadingProvider({ 
-  children, 
-  initialLoadDuration = 6000 
+export function LoadingProvider({
+  children,
+  initialLoadDuration = 6000,
 }: LoadingProviderProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [showContent, setShowContent] = useState(false);

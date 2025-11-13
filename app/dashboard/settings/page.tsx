@@ -36,7 +36,9 @@ export default function SettingsPage() {
   return (
     <div className="max-w-4xl mx-auto p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">Settings</h1>
+        <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+          Settings
+        </h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
           Manage your connected accounts and preferences
         </p>
@@ -134,7 +136,9 @@ export default function SettingsPage() {
                 </svg>
               </div>
               <div>
-                <h3 className="font-medium text-neutral-700 dark:text-neutral-300">Plaid Banking</h3>
+                <h3 className="font-medium text-neutral-700 dark:text-neutral-300">
+                  Plaid Banking
+                </h3>
                 <p className="text-sm text-neutral-500 dark:text-neutral-500">
                   Coming soon - Track expenses and budgets
                 </p>

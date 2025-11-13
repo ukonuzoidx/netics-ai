@@ -25,7 +25,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
-import { TextHoverEffect } from "@/components/ui/text-hover-effect";
+// import { TextHoverEffect } from "@/components/ui/text-hover-effect";
 
 export default function LandingPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
