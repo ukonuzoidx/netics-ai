@@ -25,20 +25,53 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
+import FeaturesModal from "@/components/FeaturesModal";
+import AboutModal from "@/components/AboutModal";
 // import { TextHoverEffect } from "@/components/ui/text-hover-effect";
 
 export default function LandingPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isFeaturesModalOpen, setIsFeaturesModalOpen] = useState(false);
+  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const { isSignedIn } = useAuth();
   const createChat = useMutation(api.chats.createChat);
   const router = useRouter();
 
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    link: string
+  ) => {
+    e.preventDefault();
+    setIsMobileMenuOpen(false);
+
+    if (link === "#chat") {
+      // Redirect to dashboard if signed in, otherwise to dashboard (which will show sign-in)
+      router.push("/dashboard");
+    } else if (link === "#features") {
+      setIsFeaturesModalOpen(true);
+    } else if (link === "#about") {
+      setIsAboutModalOpen(true);
+    }
+  };
+
   const navItems = [
-    { name: "Chat", link: "#chat" },
-    { name: "Features", link: "#features" },
-    { name: "About", link: "#about" },
+    { 
+      name: "Chat", 
+      link: "#chat",
+      onClick: (e: React.MouseEvent<HTMLAnchorElement>) => handleNavClick(e, "#chat")
+    },
+    { 
+      name: "Features", 
+      link: "#features",
+      onClick: (e: React.MouseEvent<HTMLAnchorElement>) => handleNavClick(e, "#features")
+    },
+    { 
+      name: "About", 
+      link: "#about",
+      onClick: (e: React.MouseEvent<HTMLAnchorElement>) => handleNavClick(e, "#about")
+    },
   ];
 
   const handleInputSubmit = async (
@@ -178,20 +211,19 @@ export default function LandingPage() {
               />
             </div>
           </MobileNavHeader>
-      
 
           <MobileNavMenu
             isOpen={isMobileMenuOpen}
             onClose={() => setIsMobileMenuOpen(false)}
           >
-        {/* <div className="absolute inset-0 bg-white dark:bg-black" /> */}
+            {/* <div className="absolute inset-0 bg-white dark:bg-black" /> */}
 
             {navItems.map((item, idx) => (
               <a
                 key={`mobile-link-${idx}`}
                 href={item.link}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="relative text-neutral-600 dark:text-neutral-300"
+                onClick={(e) => handleNavClick(e, item.link)}
+                className="relative text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors cursor-pointer"
               >
                 <span className="block">{item.name}</span>
               </a>
@@ -294,6 +326,16 @@ export default function LandingPage() {
           <span>Evolving into your physical humanoid assistant</span>
         </div> */}
       </section>
+
+      {/* Modals */}
+      <FeaturesModal
+        isOpen={isFeaturesModalOpen}
+        onClose={() => setIsFeaturesModalOpen(false)}
+      />
+      <AboutModal
+        isOpen={isAboutModalOpen}
+        onClose={() => setIsAboutModalOpen(false)}
+      />
     </main>
   );
 }

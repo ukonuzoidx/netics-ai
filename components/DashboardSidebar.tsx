@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { PlusIcon } from "@radix-ui/react-icons";
-import { Settings, Phone, Search } from "lucide-react";
+import { Settings, Phone } from "lucide-react";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
 import { Sidebar, SidebarBody } from "@/components/ui/sidebar";
@@ -16,6 +16,7 @@ import neticsAIsm from "../public/NeticsAISmall.png";
 export default function DashboardSidebar() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  // const [searchQuery, setSearchQuery] = useState("");
   const chats = useQuery(api.chats.listChats);
   const createChat = useMutation(api.chats.createChat);
   const deleteChat = useMutation(api.chats.deleteChat);
@@ -31,6 +32,12 @@ export default function DashboardSidebar() {
       router.push("/dashboard");
     }
   };
+
+  // Filter chats based on search query
+  // const filteredChats =
+  //   chats?.filter((chat) =>
+  //     chat.title.toLowerCase().includes(searchQuery.toLowerCase())
+  //   ) || [];
 
   return (
     <Sidebar open={open} setOpen={setOpen}>
@@ -75,22 +82,48 @@ export default function DashboardSidebar() {
           </div>
 
           {/* Search */}
-          <div className="mt-4 px-3">
+          {/* <div className="mt-4 px-3">
             {open ? (
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500 dark:text-neutral-400 z-10" />
                 <input
                   type="text"
-                  placeholder="Search"
-                  className="w-full pl-10 pr-3 py-2 rounded-2xl bg-white/60 dark:bg-white/10 backdrop-blur-xl border border-white/30 text-sm text-neutral-900 dark:text-white placeholder:text-neutral-500 dark:placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-white/50 transition-all shadow-lg"
+                  placeholder="Search chats..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-9 py-2 rounded-2xl bg-white/60 dark:bg-white/10 backdrop-blur-xl border border-white/30 text-sm text-neutral-900 dark:text-white placeholder:text-neutral-500 dark:placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-white/50 transition-all shadow-lg"
                 />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                )}
               </div>
             ) : (
-              <button className="w-full flex items-center justify-center py-2 rounded-2xl bg-white/60 dark:bg-white/10 backdrop-blur-xl hover:bg-white/80 dark:hover:bg-white/20 transition-all shadow-lg">
+              <button
+                onClick={() => setOpen(true)}
+                className="w-full flex items-center justify-center py-2 rounded-2xl bg-white/60 dark:bg-white/10 backdrop-blur-xl hover:bg-white/80 dark:hover:bg-white/20 transition-all shadow-lg"
+              >
                 <Search className="h-5 w-5 text-neutral-900 dark:text-white shrink-0" />
               </button>
             )}
-          </div>
+          </div> */}
 
           {/* Voice Chat */}
           <div className="mt-4 px-3">
@@ -136,14 +169,22 @@ export default function DashboardSidebar() {
                 </button>
               </div>
               <div className="space-y-0.5">
-                {chats?.slice(0, 10).map((chat) => (
-                  <ChatRow
-                    key={chat._id}
-                    chat={chat}
-                    onDelete={handleDeleteChat}
-                    router={router}
-                  />
-                ))}
+                {chats && chats.length > 0 ? (
+                  chats
+                    .slice(0, 10)
+                    .map((chat) => (
+                      <ChatRow
+                        key={chat._id}
+                        chat={chat}
+                        onDelete={handleDeleteChat}
+                        router={router}
+                      />
+                    ))
+                ) : (
+                  <div className="text-center py-8 text-sm text-neutral-500 dark:text-neutral-400">
+                    No chats yet
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -220,12 +261,15 @@ function ChatRow({
       onClick={handleClick}
     >
       <div className="flex items-start justify-between gap-2">
-        <p className="text-sm text-neutral-700 dark:text-neutral-300 truncate flex-1">
-          {lastMessage
-            ? lastMessage.content.substring(0, 35) +
-              (lastMessage.content.length > 35 ? "..." : "")
-            : "New conversation"}
-        </p>
+        <div className="flex-1 min-w-0">
+          {/* Last Message Preview Only */}
+          <p className="text-sm text-neutral-700 dark:text-neutral-300 truncate">
+            {lastMessage
+              ? lastMessage.content.substring(0, 50) +
+                (lastMessage.content.length > 50 ? "..." : "")
+              : "No messages yet"}
+          </p>
+        </div>
         <button
           className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
           onClick={(e) => {

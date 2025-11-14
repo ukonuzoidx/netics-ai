@@ -546,6 +546,661 @@ const arxivTool = new DynamicTool({
   },
 });
 
+// PubMed/NCBI research papers (Medical & Life Sciences)
+const pubmedTool = new DynamicTool({
+  name: "pubmed_search",
+  description:
+    "Search PubMed for medical and life sciences research papers. Provide search query as input (e.g., 'cancer treatment', 'COVID-19 vaccines', 'gene therapy').",
+  func: async (query: string) => {
+    try {
+      // First, search for article IDs
+      const searchResponse = await fetch(
+        `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encodeURIComponent(
+          query
+        )}&retmax=5&retmode=json`
+      );
+      const searchData = await searchResponse.json();
+      const ids = searchData.esearchresult?.idlist || [];
+
+      if (ids.length === 0) {
+        return JSON.stringify({
+          query,
+          source: "PubMed",
+          count: 0,
+          papers: [],
+        });
+      }
+
+      // Fetch details for these articles
+      const summaryResponse = await fetch(
+        `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${ids.join(
+          ","
+        )}&retmode=json`
+      );
+      const summaryData = await summaryResponse.json();
+
+      const papers = ids.map((id: string) => {
+        const paper = summaryData.result?.[id];
+        return {
+          title: paper?.title || "No title",
+          authors: paper?.authors
+            ?.slice(0, 3)
+            .map((a: any) => a.name)
+            .join(", "),
+          journal: paper?.source || "Unknown",
+          published: paper?.pubdate || "Unknown",
+          pmid: id,
+          link: `https://pubmed.ncbi.nlm.nih.gov/${id}/`,
+        };
+      });
+
+      return JSON.stringify(
+        {
+          query,
+          source: "PubMed/NCBI",
+          count: papers.length,
+          papers,
+        },
+        null,
+        2
+      );
+    } catch (err) {
+      return `Error searching PubMed: ${err}`;
+    }
+  },
+});
+
+// IEEE Xplore (Computer Science & Engineering)
+const ieeeTool = new DynamicTool({
+  name: "ieee_search",
+  description:
+    "Search IEEE Xplore for computer science, electrical engineering, and technology research papers. Provide search query (e.g., 'machine learning optimization', 'wireless networks', '5G technology').",
+  func: async (query: string) => {
+    try {
+      // Using IEEE's public search (scraping approach since API requires key)
+      const searchUrl = `https://ieeexplore.ieee.org/rest/search`;
+
+      const response = await fetch(searchUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        },
+        body: JSON.stringify({
+          queryText: query,
+          highlight: true,
+          returnFacets: ["ALL"],
+          returnType: "SEARCH",
+          matchPubs: true,
+          ranges: ["2015_2025_Year"],
+          rowsPerPage: "5",
+        }),
+      });
+
+      const data = await response.json();
+      const records = data.records || [];
+
+      const papers = records.slice(0, 5).map((record: any) => ({
+        title: record.articleTitle,
+        authors: record.authors?.map((a: any) => a.normalizedName).join(", "),
+        publication: record.publicationTitle,
+        year: record.publicationYear,
+        doi: record.doi,
+        abstract: record.abstract?.substring(0, 300) + "...",
+        link: `https://ieeexplore.ieee.org/document/${record.articleNumber}`,
+      }));
+
+      return JSON.stringify(
+        {
+          query,
+          source: "IEEE Xplore",
+          count: papers.length,
+          papers,
+        },
+        null,
+        2
+      );
+    } catch (err) {
+      return `Error searching IEEE Xplore: ${err}. IEEE requires authentication for full access. Try using Google Scholar or arXiv for CS/Engineering papers.`;
+    }
+  },
+});
+
+// CORE (Open Access research aggregator)
+const coreTool = new DynamicTool({
+  name: "core_search",
+  description:
+    "Search CORE for open access research papers across all disciplines. Provides free full-text access to millions of papers. Input: search query (e.g., 'artificial intelligence ethics', 'climate change mitigation').",
+  func: async (query: string) => {
+    try {
+      // Using CORE's public search API (no key required for basic search)
+      const response = await fetch(
+        `https://core.ac.uk/api-v2/search/${encodeURIComponent(
+          query
+        )}?page=1&pageSize=5`,
+        {
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+      const results = data.data || [];
+
+      const papers = results.map((paper: any) => ({
+        title: paper.title,
+        authors: paper.authors?.join(", ") || "Unknown",
+        year: paper.yearPublished || paper.publishedDate?.split("-")[0],
+        abstract: paper.description?.substring(0, 300) + "...",
+        downloadUrl: paper.downloadUrl,
+        link: `https://core.ac.uk/display/${paper.id}`,
+        openAccess: true,
+      }));
+
+      return JSON.stringify(
+        {
+          query,
+          source: "CORE (Open Access)",
+          count: papers.length,
+          papers,
+          note: "All papers are open access and can be downloaded freely",
+        },
+        null,
+        2
+      );
+    } catch (err) {
+      return `Error searching CORE: ${err}`;
+    }
+  },
+});
+
+// Semantic Scholar (AI-powered research search)
+const semanticScholarTool = new DynamicTool({
+  name: "semantic_scholar_search",
+  description:
+    "Search Semantic Scholar for research papers across all fields with AI-powered relevance. Provides paper citations, references, and influence metrics. Input: search query (e.g., 'neural networks', 'quantum computing').",
+  func: async (query: string) => {
+    try {
+      const response = await fetch(
+        `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(
+          query
+        )}&limit=5&fields=title,authors,year,abstract,citationCount,influentialCitationCount,url,openAccessPdf`,
+        {
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+      const papers = data.data || [];
+
+      const results = papers.map((paper: any) => ({
+        title: paper.title,
+        authors: paper.authors?.map((a: any) => a.name).join(", "),
+        year: paper.year,
+        abstract: paper.abstract?.substring(0, 300) + "...",
+        citations: paper.citationCount,
+        influentialCitations: paper.influentialCitationCount,
+        url: paper.url,
+        openAccess: paper.openAccessPdf?.url || null,
+      }));
+
+      return JSON.stringify(
+        {
+          query,
+          source: "Semantic Scholar",
+          count: results.length,
+          papers: results,
+        },
+        null,
+        2
+      );
+    } catch (err) {
+      return `Error searching Semantic Scholar: ${err}`;
+    }
+  },
+});
+
+// CrossRef (DOI lookup and metadata)
+const crossrefTool = new DynamicTool({
+  name: "crossref_search",
+  description:
+    "Search CrossRef for academic papers and get DOI metadata. Covers journals, books, conferences across all disciplines. Input: search query or DOI (e.g., 'machine learning', '10.1000/xyz123').",
+  func: async (query: string) => {
+    try {
+      const isDOI = query.startsWith("10.");
+      const url = isDOI
+        ? `https://api.crossref.org/works/${encodeURIComponent(query)}`
+        : `https://api.crossref.org/works?query=${encodeURIComponent(
+            query
+          )}&rows=5`;
+
+      const response = await fetch(url, {
+        headers: {
+          "User-Agent": "Netics-AI-Research-Bot (mailto:research@netics.ai)",
+        },
+      });
+
+      const data = await response.json();
+
+      if (isDOI) {
+        const work = data.message;
+        return JSON.stringify(
+          {
+            title: work.title?.[0],
+            authors: work.author
+              ?.map((a: any) => `${a.given} ${a.family}`)
+              .join(", "),
+            published: work.published?.["date-parts"]?.[0]?.join("-"),
+            journal: work["container-title"]?.[0],
+            doi: work.DOI,
+            citations: work["is-referenced-by-count"],
+            url: work.URL,
+          },
+          null,
+          2
+        );
+      } else {
+        const papers = data.message.items.slice(0, 5).map((work: any) => ({
+          title: work.title?.[0],
+          authors: work.author
+            ?.map((a: any) => `${a.given} ${a.family}`)
+            .join(", "),
+          published: work.published?.["date-parts"]?.[0]?.join("-"),
+          journal: work["container-title"]?.[0],
+          doi: work.DOI,
+          citations: work["is-referenced-by-count"],
+          url: work.URL,
+        }));
+
+        return JSON.stringify(
+          {
+            query,
+            source: "CrossRef",
+            count: papers.length,
+            papers,
+          },
+          null,
+          2
+        );
+      }
+    } catch (err) {
+      return `Error searching CrossRef: ${err}`;
+    }
+  },
+});
+
+// ResearchGate scraper (limited without API)
+const researchGateTool = new DynamicTool({
+  name: "researchgate_search",
+  description:
+    "Search ResearchGate for research papers and researchers. Note: Limited results without authentication. Provide search query (e.g., 'neural networks', 'Dr. John Smith').",
+  func: async (query: string) => {
+    try {
+      // ResearchGate doesn't have a public API, so we'll use web scraping
+      const searchUrl = `https://www.researchgate.net/search/publication?q=${encodeURIComponent(
+        query
+      )}`;
+
+      const response = await fetch(searchUrl, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        },
+      });
+
+      const html = await response.text();
+
+      // Basic parsing (ResearchGate has complex structure)
+      const titleMatches = [
+        ...html.matchAll(
+          /<a[^>]*class="[^"]*nova-legacy-e-link[^"]*"[^>]*>([^<]+)<\/a>/g
+        ),
+      ];
+      const results = titleMatches.slice(0, 5).map((match) => ({
+        title: match[1].trim(),
+        source: "ResearchGate",
+      }));
+
+      return JSON.stringify(
+        {
+          query,
+          source: "ResearchGate",
+          count: results.length,
+          papers: results,
+          note: "ResearchGate requires authentication for full access. For better results, use Semantic Scholar, CORE, or Google Scholar.",
+        },
+        null,
+        2
+      );
+    } catch (err) {
+      return `Error searching ResearchGate: ${err}. ResearchGate requires authentication. Try Semantic Scholar or CORE instead.`;
+    }
+  },
+});
+
+// Google Scholar (via Serper API alternative - SerpApi free tier)
+const googleScholarTool = new DynamicTool({
+  name: "google_scholar_search",
+  description:
+    "Search Google Scholar for academic papers across all disciplines. Most comprehensive academic search. Input: search query (e.g., 'machine learning', 'climate change').",
+  func: async (query: string) => {
+    try {
+      // Using a direct scraping approach (be respectful of rate limits)
+      const searchUrl = `https://scholar.google.com/scholar?q=${encodeURIComponent(
+        query
+      )}&hl=en`;
+
+      const response = await fetch(searchUrl, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        },
+      });
+
+      const html = await response.text();
+
+      // Parse results (basic parsing)
+      const results: any[] = [];
+      const resultBlocks = [
+        ...html.matchAll(/<div class="gs_ri">([\s\S]*?)<\/div>/g),
+      ];
+
+      for (let i = 0; i < Math.min(5, resultBlocks.length); i++) {
+        const block = resultBlocks[i][1];
+        const titleMatch = block.match(/<h3[^>]*><a[^>]*>([\s\S]*?)<\/a>/);
+        const snippetMatch = block.match(
+          /<div class="gs_rs">([\s\S]*?)<\/div>/
+        );
+        const authorMatch = block.match(/<div class="gs_a">([\s\S]*?)<\/div>/);
+
+        results.push({
+          title: titleMatch?.[1].replace(/<[^>]+>/g, "").trim(),
+          snippet: snippetMatch?.[1]
+            .replace(/<[^>]+>/g, "")
+            .trim()
+            .substring(0, 200),
+          metadata: authorMatch?.[1].replace(/<[^>]+>/g, "").trim(),
+        });
+      }
+
+      return JSON.stringify(
+        {
+          query,
+          source: "Google Scholar",
+          count: results.length,
+          papers: results,
+          note: "For more reliable results, use Semantic Scholar or CORE which have official APIs.",
+        },
+        null,
+        2
+      );
+    } catch (err) {
+      return `Error searching Google Scholar: ${err}. Google Scholar blocks automated access. Use Semantic Scholar, CORE, or PubMed instead for reliable results.`;
+    }
+  },
+});
+
+// GitHub Integration
+const githubSearchTool = new DynamicTool({
+  name: "github_search",
+  description:
+    "Search GitHub repositories, code, issues, or users. Input format: 'query type:repo|code|issues|users' (e.g., 'machine learning type:repo', 'SQL injection type:code')",
+  func: async (input: string) => {
+    try {
+      const [query, typeParam] = input.split("type:");
+      const searchType = typeParam?.trim() || "repositories";
+
+      const response = await fetch(
+        `https://api.github.com/search/${searchType}?q=${encodeURIComponent(
+          query.trim()
+        )}&per_page=5`,
+        {
+          headers: {
+            Accept: "application/vnd.github.v3+json",
+            "User-Agent": "Netics-AI-Agent",
+          },
+        }
+      );
+      const data = await response.json();
+
+      return JSON.stringify(
+        data.items?.slice(0, 5).map((item: any) => ({
+          name: item.name || item.login,
+          description: item.description,
+          url: item.html_url,
+          stars: item.stargazers_count,
+          language: item.language,
+          updated: item.updated_at,
+        })) || []
+      );
+    } catch (err) {
+      return `Error searching GitHub: ${err}`;
+    }
+  },
+});
+
+// CVE/Security Vulnerability Lookup
+const cveSearchTool = new DynamicTool({
+  name: "cve_search",
+  description:
+    "Search for CVE (Common Vulnerabilities and Exposures) security information. Provide CVE ID (e.g., 'CVE-2024-1234') or search term (e.g., 'apache log4j')",
+  func: async (query: string) => {
+    try {
+      const isCVEId = query.match(/CVE-\d{4}-\d+/i);
+
+      if (isCVEId) {
+        const response = await fetch(
+          `https://cveawg.mitre.org/api/cve/${query.toUpperCase()}`
+        );
+        const data = await response.json();
+
+        return JSON.stringify({
+          id: data.cveMetadata?.cveId,
+          state: data.cveMetadata?.state,
+          description: data.containers?.cna?.descriptions?.[0]?.value,
+          severity: data.containers?.cna?.metrics?.[0]?.cvssV3_1?.baseScore,
+          published: data.cveMetadata?.datePublished,
+          references: data.containers?.cna?.references?.slice(0, 3),
+        });
+      } else {
+        // Search using NVD API
+        const response = await fetch(
+          `https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=${encodeURIComponent(
+            query
+          )}&resultsPerPage=5`
+        );
+        const data = await response.json();
+
+        return JSON.stringify(
+          data.vulnerabilities?.map((v: any) => ({
+            id: v.cve?.id,
+            description: v.cve?.descriptions?.[0]?.value?.substring(0, 200),
+            severity: v.cve?.metrics?.cvssMetricV31?.[0]?.cvssData?.baseScore,
+            published: v.cve?.published,
+          })) || []
+        );
+      }
+    } catch (err) {
+      return `Error searching CVE database: ${err}`;
+    }
+  },
+});
+
+// DNS/WHOIS Lookup
+const dnsLookupTool = new DynamicTool({
+  name: "dns_lookup",
+  description:
+    "Perform DNS lookups for domains. Provide domain name (e.g., 'example.com')",
+  func: async (domain: string) => {
+    try {
+      const response = await fetch(
+        `https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=A`
+      );
+      const data = await response.json();
+
+      return JSON.stringify({
+        domain: domain,
+        status: data.Status,
+        answers: data.Answer?.map((a: any) => ({
+          type: a.type,
+          data: a.data,
+          ttl: a.TTL,
+        })),
+      });
+    } catch (err) {
+      return `Error performing DNS lookup: ${err}`;
+    }
+  },
+});
+
+// Package/Dependency Checker
+const npmPackageTool = new DynamicTool({
+  name: "npm_package_info",
+  description:
+    "Get information about npm packages including version, license, and dependencies. Provide package name (e.g., 'react', 'express')",
+  func: async (packageName: string) => {
+    try {
+      const response = await fetch(
+        `https://registry.npmjs.org/${encodeURIComponent(packageName)}`
+      );
+      const data = await response.json();
+
+      const latest = data["dist-tags"]?.latest;
+      const versionInfo = data.versions?.[latest];
+
+      return JSON.stringify({
+        name: data.name,
+        description: data.description,
+        latestVersion: latest,
+        license: versionInfo?.license,
+        dependencies: Object.keys(versionInfo?.dependencies || {}).length,
+        homepage: data.homepage,
+        repository: data.repository?.url,
+        lastPublish: data.time?.[latest],
+      });
+    } catch (err) {
+      return `Error fetching npm package info: ${err}`;
+    }
+  },
+});
+
+// IP Geolocation & Information
+const ipLookupTool = new DynamicTool({
+  name: "ip_lookup",
+  description:
+    "Get geolocation and information for an IP address. Provide IP address (e.g., '8.8.8.8')",
+  func: async (ip: string) => {
+    try {
+      const response = await fetch(`https://ipapi.co/${ip}/json/`);
+      const data = await response.json();
+
+      return JSON.stringify({
+        ip: data.ip,
+        city: data.city,
+        region: data.region,
+        country: data.country_name,
+        org: data.org,
+        asn: data.asn,
+        timezone: data.timezone,
+      });
+    } catch (err) {
+      return `Error looking up IP: ${err}`;
+    }
+  },
+});
+
+// Stack Overflow Search
+const stackOverflowTool = new DynamicTool({
+  name: "stackoverflow_search",
+  description:
+    "Search Stack Overflow for programming questions and solutions. Provide search query (e.g., 'python asyncio', 'react hooks')",
+  func: async (query: string) => {
+    try {
+      const response = await fetch(
+        `https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=relevance&q=${encodeURIComponent(
+          query
+        )}&site=stackoverflow`
+      );
+      const data = await response.json();
+
+      return JSON.stringify(
+        data.items?.slice(0, 5).map((item: any) => ({
+          title: item.title,
+          link: item.link,
+          score: item.score,
+          answered: item.is_answered,
+          answers: item.answer_count,
+          tags: item.tags,
+        })) || []
+      );
+    } catch (err) {
+      return `Error searching Stack Overflow: ${err}`;
+    }
+  },
+});
+
+// PyPI Package Information
+const pypiPackageTool = new DynamicTool({
+  name: "pypi_package_info",
+  description:
+    "Get information about Python packages from PyPI. Provide package name (e.g., 'numpy', 'django')",
+  func: async (packageName: string) => {
+    try {
+      const response = await fetch(
+        `https://pypi.org/pypi/${encodeURIComponent(packageName)}/json`
+      );
+      const data = await response.json();
+
+      return JSON.stringify({
+        name: data.info.name,
+        version: data.info.version,
+        description: data.info.summary,
+        author: data.info.author,
+        license: data.info.license,
+        homepage: data.info.home_page,
+        requires_python: data.info.requires_python,
+        classifiers: data.info.classifiers?.slice(0, 5),
+      });
+    } catch (err) {
+      return `Error fetching PyPI package info: ${err}`;
+    }
+  },
+});
+
+// Docker Hub Search
+const dockerHubTool = new DynamicTool({
+  name: "docker_hub_search",
+  description:
+    "Search Docker Hub for container images. Provide search query (e.g., 'nginx', 'postgres')",
+  func: async (query: string) => {
+    try {
+      const response = await fetch(
+        `https://hub.docker.com/api/content/v1/products/search?q=${encodeURIComponent(
+          query
+        )}&page_size=5`
+      );
+      const data = await response.json();
+
+      return JSON.stringify(
+        data.summaries?.slice(0, 5).map((item: any) => ({
+          name: item.name,
+          slug: item.slug,
+          description: item.short_description,
+          stars: item.star_count,
+          pulls: item.pull_count,
+          type: item.type,
+        })) || []
+      );
+    } catch (err) {
+      return `Error searching Docker Hub: ${err}`;
+    }
+  },
+});
+
 // Google Calendar tool - Uses Clerk's Google OAuth token (no separate sign-in!)
 const calendarTool = new DynamicTool({
   name: "schedule_meeting",
@@ -687,22 +1342,50 @@ Then try scheduling your meeting again!`;
 });
 
 const tools = [
+  // Academic Research Tools (Most Important for Research)
+  semanticScholarTool, // AI-powered, best for most queries
+  pubmedTool, // Medical & Life Sciences
+  arxivTool, // Physics, CS, Math
+  coreTool, // Open Access papers across all fields
+  crossrefTool, // DOI lookup & metadata
+  googleScholarTool, // Most comprehensive (may have rate limits)
+  ieeeTool, // Engineering & CS (may require auth)
+  researchGateTool, // Social network for researchers (limited)
+
+  // General Research Tools
   wikipediaSearchTool,
   wikipediaPageTool,
-  youtubeTranscriptTool,
+  academicSearchTool,
   googleBooksTool,
   googleBookDetailsTool,
-  calendarTool,
-  academicSearchTool,
-  arxivTool,
-  dummyCommentsTool,
-  customersTool,
+
+  // Developer Tools
+  githubSearchTool,
+  stackOverflowTool,
+  npmPackageTool,
+  pypiPackageTool,
+  dockerHubTool,
+
+  // Cybersecurity Tools
+  cveSearchTool,
+  dnsLookupTool,
+  ipLookupTool,
+
+  // Productivity Tools
+  // calendarTool, // DISABLED - Pending Google verification
+  youtubeTranscriptTool,
+
+  // Utility Tools
   calculatorTool,
   webScraperTool,
   dateTimeTool,
   weatherTool,
   currencyConverterTool,
   newsHeadlinesTool,
+
+  // Demo/Test Tools
+  dummyCommentsTool,
+  customersTool,
 ];
 const toolNode = new ToolNode(tools);
 
@@ -753,6 +1436,18 @@ function shouldContinue(state: typeof MessagesAnnotation.State) {
   const messages = state.messages;
   const lastMessage = messages[messages.length - 1] as AIMessage;
 
+  // Count the number of tool calls in this conversation
+  const toolCallCount = messages.filter((msg) => {
+    const aiMsg = msg as AIMessage;
+    return aiMsg.tool_calls && aiMsg.tool_calls.length > 0;
+  }).length;
+
+  // If we've made too many tool calls (>15), force stop to prevent infinite loops
+  if (toolCallCount > 15) {
+    console.log("⚠️ Tool call limit reached, stopping agent");
+    return END;
+  }
+
   // If the LLM makes a tool call, then we route to the "tools" node
   if (lastMessage.tool_calls?.length) {
     return "tools";
@@ -776,9 +1471,23 @@ const createWorkflow = () => {
       // Create the system message content
       const systemContent = SYSTEM_MESSAGE;
 
+      // Count tool calls to warn the agent
+      const toolCallCount = state.messages.filter((msg) => {
+        const aiMsg = msg as AIMessage;
+        return aiMsg.tool_calls && aiMsg.tool_calls.length > 0;
+      }).length;
+
+      // Add warning if too many tool calls
+      let systemWithWarning = systemContent;
+      if (toolCallCount > 10) {
+        systemWithWarning += `\n\n⚠️ WARNING: You've made ${toolCallCount} tool calls. You MUST provide a comprehensive final answer now based on what you've gathered. DO NOT make more tool calls.`;
+      } else if (toolCallCount > 5) {
+        systemWithWarning += `\n\n⚠️ Note: You've made ${toolCallCount} tool calls. Try to synthesize your findings and provide an answer soon.`;
+      }
+
       // Create the prompt template with system message and messages placeholder
       const promptTemplate = ChatPromptTemplate.fromMessages([
-        new SystemMessage(systemContent, {
+        new SystemMessage(systemWithWarning, {
           cache_control: { type: "ephemeral" },
         }),
         new MessagesPlaceholder("messages"),
@@ -866,6 +1575,7 @@ export async function submitQuestion(
       streamMode: "messages",
       runId: chatId || undefined,
       metadata: { userId }, // Pass userId through metadata
+      recursionLimit: 50, // Increased from default 25 to 50
     }
   );
   return stream;

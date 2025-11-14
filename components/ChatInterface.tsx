@@ -433,9 +433,7 @@ function ChatInterfaceInner({ chatId, initialMessages }: ChatInterfaceProps) {
                     ))}
                   </div>
                   <span className="text-sm text-neutral-700 dark:text-neutral-300">
-                    {currentTool?.name
-                      ? `Using ${currentTool.name}...`
-                      : "Processing..."}
+                    Processing response...
                   </span>
                 </div>
               </div>
